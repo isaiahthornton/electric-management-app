@@ -1,4 +1,14 @@
 <h1> {{ title() }}</h1>
 <p>{{ intro() }}</p>
 
+<h2>Available Rate Plans</h2>
+@for (plan of ratePlans(); track plan.id){
+  <div>
+    <h3>{{ plan.name }}</h3>
+    <p>Price: {{ plan.pricePerKwh | currency }} per kWh + {{ plan.monthlyFee | currency }}/month</p>
+    <p>Description: {{ plan.description }}</p>
+  </div>
+} @empty {
+  <p>Loading rate plans...</p>
+}
 <router-outlet />
