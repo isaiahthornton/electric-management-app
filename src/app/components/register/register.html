@@ -1,0 +1,48 @@
+<section class="register">
+  <h1>Register for Online Access</h1>
+  <p>You'll need your account number from a recent bill.</p>
+
+  <form [formGroup]="registerForm" (ngSubmit)="register()">
+    <label>
+      Account Number
+      <input formControlName="accountNumber" placeholder="TE-100001" />
+    </label>
+    @if (registerForm.controls.accountNumber.touched && registerForm.controls.accountNumber.invalid) {
+      <p class="field-error">Enter your account number as shown on your bill (e.g. TE-100001).</p>
+    }
+
+    <label>
+      Email on File
+      <input type="email" formControlName="email" />
+    </label>
+    @if (registerForm.controls.email.touched && registerForm.controls.email.invalid) {
+      <p class="field-error">Enter a valid email address.</p>
+    }
+
+    <label>
+      Password
+      <input type="password" formControlName="password" />
+    </label>
+    @if (registerForm.controls.password.touched && registerForm.controls.password.invalid) {
+      <p class="field-error">Password must be at least 8 characters.</p>
+    }
+
+    <label>
+      Confirm Password
+      <input type="password" formControlName="confirmPassword" />
+    </label>
+    @if (registerForm.controls.confirmPassword.touched && registerForm.hasError('passwordsMismatch')) {
+      <p class="field-error">Passwords don't match.</p>
+    }
+
+    <button type="submit" [disabled]="isLoading()">
+      {{ isLoading() ? 'Creating account…' : 'Register' }}
+    </button>
+
+    @if (errorMessage()) {
+      <p class="error-message">{{ errorMessage() }}</p>
+    }
+  </form>
+
+  <p>Already registered? <a routerLink="/login">Log in</a></p>
+</section>

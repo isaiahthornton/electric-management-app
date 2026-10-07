@@ -1,25 +1,111 @@
 {
   "users": [
-    { "id": 1, "email": "support@thornenergy.com", "password": "admin123", "role": "admin", "customerId": null },
-    { "id": 2, "email": "jane@example.com", "password": "jane123", "role": "customer", "customerId": 1 }
+    {
+      "id": 1,
+      "email": "support@thornenergy.com",
+      "password": "admin123",
+      "role": "admin",
+      "customerId": null
+    },
+    {
+      "id": 2,
+      "email": "jane@example.com",
+      "password": "jane123",
+      "role": "customer",
+      "customerId": 1
+    },
+    {
+      "email": "john@example.com",
+      "password": "marcus123",
+      "role": "customer",
+      "customerId": 2,
+      "id": 3
+    }
   ],
   "ratePlans": [
-    { "id": 1, "name": "Standard", "pricePerKwh": 0.18, "monthlyFee": 20, "description": "Flat rate, any time of day" },
-    { "id": 2, "name": "Time-of-Use", "pricePerKwh": 0.15, "monthlyFee": 15, "description": "Cheaper nights and weekends" },
-    { "id": 3, "name": "Green Energy", "pricePerKwh": 0.21, "monthlyFee": 12.5, "description": "100% renewable energy" }
+    {
+      "id": 1,
+      "name": "Standard",
+      "pricePerKwh": 0.18,
+      "monthlyFee": 20,
+      "description": "Flat rate, any time of day"
+    },
+    {
+      "id": 2,
+      "name": "Time-of-Use",
+      "pricePerKwh": 0.15,
+      "monthlyFee": 15,
+      "description": "Cheaper nights and weekends"
+    },
+    {
+      "id": 3,
+      "name": "Green Energy",
+      "pricePerKwh": 0.21,
+      "monthlyFee": 12.5,
+      "description": "100% renewable energy"
+    }
   ],
   "customers": [
-    { "id": 1, "accountNumber": "TE-100001", "firstName": "Jane", "lastName": "Doe", "phone": "609-555-0101", "email": "jane@example.com", "serviceAddress": "12 Maple Ave, East Windsor, NJ", "ratePlanId": 1, "status": "active" }
+    {
+      "id": 1,
+      "accountNumber": "TE-100001",
+      "firstName": "Jane",
+      "lastName": "Doe",
+      "phone": "609-555-0101",
+      "email": "jane@example.com",
+      "serviceAddress": "12 Maple Ave, East Windsor, NJ",
+      "ratePlanId": 1,
+      "status": "active"
+    },
+    {
+      "id": 2,
+      "accountNumber": "TE-100002",
+      "firstName": "John",
+      "lastName": "Smith",
+      "phone": "609-555-0202",
+      "email": "john@example.com",
+      "serviceAddress": "45 Oak St, East Windsor, NJ",
+      "ratePlanId": 2,
+      "status": "active"
+    }
   ],
   "meters": [
-    { "id": 1, "customerId": 1, "meterNumber": "MTR-5001", "installationDate": "2022-03-14", "status": "active" }
+    {
+      "id": 1,
+      "customerId": 1,
+      "meterNumber": "MTR-5001",
+      "installationDate": "2022-03-14",
+      "status": "active"
+    }
   ],
   "meterReadings": [
-    { "id": 1, "meterId": 1, "readingDate": "2026-09-01", "readingValue": 15200 },
-    { "id": 2, "meterId": 1, "readingDate": "2026-10-01", "readingValue": 15840 }
+    {
+      "id": 1,
+      "meterId": 1,
+      "readingDate": "2026-09-01",
+      "readingValue": 15200
+    },
+    {
+      "id": 2,
+      "meterId": 1,
+      "readingDate": "2026-10-01",
+      "readingValue": 15840
+    }
   ],
   "bills": [
-    { "id": 1, "customerId": 1, "periodStart": "2026-09-01", "periodEnd": "2026-09-30", "kwhUsed": 640, "energyCharge": 115.2, "serviceCharge": 20, "amountDue": 135.2, "dueDate": "2026-10-21", "status": "unpaid", "paidDate": null }
+    {
+      "id": 1,
+      "customerId": 1,
+      "periodStart": "2026-09-01",
+      "periodEnd": "2026-09-30",
+      "kwhUsed": 640,
+      "energyCharge": 115.2,
+      "serviceCharge": 20,
+      "amountDue": 135.2,
+      "dueDate": "2026-10-21",
+      "status": "unpaid",
+      "paidDate": null
+    }
   ],
   "outages": []
 }
