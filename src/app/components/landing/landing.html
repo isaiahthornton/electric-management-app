@@ -1,0 +1,25 @@
+<section class="hero">
+  <h1>Powering East Windsor and Beyond</h1>
+  <p>
+    Thornton Energy Inc. is a leading provider of sustainable energy solutions, dedicated to
+    delivering innovative and efficient energy systems for residential, commercial, and
+    industrial applications.
+  </p>
+  <div class="hero-actions">
+    <a routerLink="/login" class="btn btn-primary">Log In to Your Account</a>
+    <a routerLink="/login" class="btn btn-secondary">Report an Outage</a>
+  </div>
+</section>
+
+<section class="plans">
+  <h2>Our Rate Plans</h2>
+  @for (plan of ratePlans(); track plan.id) {
+    <div class="plan-card">
+      <h3>{{ plan.name }}</h3>
+      <p>{{ plan.description }}</p>
+      <p>{{ plan.pricePerKwh | currency }} per kWh + {{ plan.monthlyFee | currency }}/month</p>
+    </div>
+  } @empty {
+    <p>Loading plans…</p>
+  }
+</section>

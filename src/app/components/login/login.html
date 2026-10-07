@@ -1,0 +1,25 @@
+<section class="login">
+  <h1>Log In to Your Account</h1>
+
+  <form (ngSubmit)="attemptLogin()" #loginForm="ngForm">
+    <label>
+      Email
+      <input type="email" name="email" [(ngModel)]="email" required />
+    </label>
+
+    <label>
+      Password
+      <input type="password" name="password" [(ngModel)]="password" required />
+    </label>
+
+    <button type="submit" [disabled]="loginForm.invalid || isLoading()">
+      {{ isLoading() ? 'Logging in…' : 'Log In' }}
+    </button>
+
+    @if (errorMessage()) {
+      <p class="error-message">{{ errorMessage() }}</p>
+    }
+  </form>
+
+  <p>Don't have an account? <a routerLink="/register">Register</a></p>
+</section>

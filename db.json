@@ -1,6 +1,6 @@
 {
   "users": [
-    { "id": 1, "email": "admin@thornton.com", "password": "admin123", "role": "admin", "customerId": null },
+    { "id": 1, "email": "support@thornenergy.com", "password": "admin123", "role": "admin", "customerId": null },
     { "id": 2, "email": "jane@example.com", "password": "jane123", "role": "customer", "customerId": 1 }
   ],
   "ratePlans": [
@@ -19,7 +19,7 @@
     { "id": 2, "meterId": 1, "readingDate": "2026-10-01", "readingValue": 15840 }
   ],
   "bills": [
-    { "id": 1, "customerId": 1, "periodStart": "2026-09-01", "periodEnd": "2026-09-30", "kwhUsed": 640, "energyCharge": 115.2, "serviceCharge": 12.5, "amountDue": 127.7, "dueDate": "2026-10-21", "status": "unpaid", "paidDate": null }
+    { "id": 1, "customerId": 1, "periodStart": "2026-09-01", "periodEnd": "2026-09-30", "kwhUsed": 640, "energyCharge": 115.2, "serviceCharge": 20, "amountDue": 135.2, "dueDate": "2026-10-21", "status": "unpaid", "paidDate": null }
   ],
   "outages": []
 }
