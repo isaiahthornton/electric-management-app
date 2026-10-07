@@ -1,0 +1,23 @@
+{
+  "users": [
+    { "id": 1, "email": "admin@thornton.com", "password": "admin123", "role": "admin", "customerId": null },
+    { "id": 2, "email": "jane@example.com", "password": "jane123", "role": "customer", "customerId": 1 }
+  ],
+  "ratePlans": [
+    { "id": 1, "name": "Standard", "pricePerKwh": 0.18, "monthlyFee": 12.5, "description": "Flat rate, any time of day" }
+  ],
+  "customers": [
+    { "id": 1, "accountNumber": "TE-100001", "firstName": "Jane", "lastName": "Doe", "phone": "609-555-0101", "email": "jane@example.com", "serviceAddress": "12 Maple Ave, East Windsor, NJ", "ratePlanId": 1, "status": "active" }
+  ],
+  "meters": [
+    { "id": 1, "customerId": 1, "meterNumber": "MTR-5001", "installationDate": "2022-03-14", "status": "active" }
+  ],
+  "meterReadings": [
+    { "id": 1, "meterId": 1, "readingDate": "2026-09-01", "readingValue": 15200 },
+    { "id": 2, "meterId": 1, "readingDate": "2026-10-01", "readingValue": 15840 }
+  ],
+  "bills": [
+    { "id": 1, "customerId": 1, "periodStart": "2026-09-01", "periodEnd": "2026-09-30", "kwhUsed": 640, "energyCharge": 115.2, "serviceFee": 12.5, "amountDue": 127.7, "dueDate": "2026-10-21", "status": "unpaid", "paidDate": null }
+  ],
+  "outages": []
+}

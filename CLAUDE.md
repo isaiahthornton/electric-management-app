@@ -1,59 +1,45 @@
-You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
+# Electric Management App
 
-## TypeScript Best Practices
+Revature Project 1: a mock electric utility management system built in Angular, demoed to the client (an electric utility). Scope is 1–2 weeks. Use a fictional company name in the UI, not a real utility's branding.
 
-- Use strict type checking
-- Prefer type inference when the type is obvious
-- Avoid the `any` type; use `unknown` when type is uncertain
+## How to help me
 
-## Angular Best Practices
+- I'm learning Angular and want to write the code myself. Guide me step by step: explain the concept first (plain-English analogy, then code), then tell me what to write and where. Don't create or edit files unless I ask you to.
+- One small step at a time, and we run it (`ng serve`) before moving on.
+- When I hit an error, help me read it and find the cause rather than just pasting a fix.
+- Keep examples consistent with this app's own models (Customer, Meter, Bill, etc.).
 
-- Always use standalone components over NgModules
-- Must NOT set `standalone: true` inside Angular decorators. It's the default in Angular v20+.
-- Do NOT set `changeDetection: ChangeDetectionStrategy.OnPush` explicitly. `OnPush` is the default in Angular v22+.
-- Use signals for state management
-- Implement lazy loading for feature routes
-- Do NOT use the `@HostBinding` and `@HostListener` decorators. Put host bindings inside the `host` object of the `@Component` or `@Directive` decorator instead
-- Use `NgOptimizedImage` for all static images.
-  - `NgOptimizedImage` does not work for inline base64 images.
+## Stack and conventions
 
-## Accessibility Requirements
+- Angular 22, standalone components (no NgModules), `bootstrapApplication` in `main.ts`.
+- New file naming: `customer-list.ts` / `customer-list.html` with class `CustomerList` (no `.component` suffix).
+- State in signals (`signal`, `computed`, `.set`, `.update`); read in templates as `{{ value() }}`.
+- Templates use built-in control flow: `@if`, `@for` (with `track`), `@switch`.
+- `inject()` for dependencies instead of constructor injection.
+- Routing in `app.routes.ts`; lazy pages with `loadComponent`.
+- Plain CSS.
+- No backend yet: a mock data service holds seed data in signals.
+- SSR was enabled at `ng new` (`server.ts`, `app.routes.server.ts`). Code that touches `localStorage` or `window` must only run in the browser.
 
-- It MUST pass all AXE checks.
-- It MUST follow all WCAG AA minimums, including focus management, color contrast, and ARIA attributes.
+## Features
 
-### Components
+Customer: register/login, view meter readings, monthly energy usage, billing history (pay a bill), report an outage.
 
-- Keep components small and focused on a single responsibility
-- Use `input()` and `output()` functions instead of decorators
-- Use `model()` for two-way bound properties with `[(prop)]` syntax instead of pairing `input()` with `output()`
-- Use `computed()` for derived state
-- Use `linkedSignal()` for state derived from multiple reactive sources that must stay synchronized
-- Prefer inline templates for small components
-- Prefer Signal Forms (`@angular/forms/signals`) for new forms. They are stable in Angular v22+ and provide signal-based state, type-safe field access, and schema-based validation
-- When not using Signal Forms, prefer Reactive forms instead of Template-driven ones
-- Do NOT use `ngClass`, use `class` bindings instead
-- Do NOT use `ngStyle`, use `style` bindings instead
-- Do NOT import `CommonModule`, import only the directives and pipes the template uses, such as `AsyncPipe` or `DatePipe`
-- When using external templates/styles, use paths relative to the component TS file.
+Admin: manage customer accounts, update meter info, configure rate plans, view billing periods, track and update outages.
 
-## State Management
+## Build plan
 
-- Use signals for local component state
-- Use `computed()` for derived state
-- Keep state transformations pure and predictable
-- Do NOT use `mutate` on signals, use `update` or `set` instead
+1. Clean slate: clear the starter `app.html`.
+2. Models: interfaces for Customer, Meter, MeterReading, Bill, RatePlan, Outage.
+3. Mock data service with seed data in signals.
+4. Routing and layout: navbar, empty customer and admin pages.
+5. Mock login/register and route guards (customer vs admin).
+6. Customer features, one page at a time.
+7. Admin features, one page at a time.
 
-## Templates
+## Commands
 
-- Keep templates simple and avoid complex logic
-- Use native control flow (`@if`, `@for`, `@switch`) instead of `*ngIf`, `*ngFor`, `*ngSwitch`
-- Use the async pipe to handle observables
-- Do not assume globals like (`new Date()`) are available.
-
-## Services
-
-- Design services around a single responsibility
-- Use the `providedIn: 'root'` option for singleton services
-- Prefer the `@Service` decorator over `@Injectable({providedIn: 'root'})` for new singleton services (Angular v22+)
-- Use the `inject()` function instead of constructor injection
+- `ng serve` — dev server at http://localhost:4200
+- `ng generate component <path>` — new component
+- `ng generate service <path>` — new service
+- `ng build` — production build
