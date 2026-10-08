@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../services/auth-service';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   imports: [RouterLink, RouterLinkActive],
@@ -7,4 +9,14 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   styleUrl: './navbar.css',
   templateUrl: './navbar.html',
 })
-export class Navbar {}
+export class Navbar {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
+  protected readonly currentUser = toSignal(this.authService.currentUser$, { initialValue: null });
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/']);
+  }
+}

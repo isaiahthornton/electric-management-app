@@ -1,0 +1,12 @@
+<div class ="portal">
+  <aside class="sidebar">
+   <a routerLink="/account" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true}">Dashboard</a>
+   <a routerLink="/account/usage" routerLinkActive="active">Usage</a>
+   <a routerLink="/account/billing" routerLinkActive="active">Billing</a>
+   <a routerLink="/account/outages" routerLinkActive="active">Outages</a>
+   <a routerLink="/account/rate-plans" routerLinkActive="active">Rate Plans</a>
+  </aside>
+  <section class="account-content">
+    <router-outlet />
+  </section>
+</div>
