@@ -1,0 +1,57 @@
+<h1>Energy Usage</h1>
+
+@if (isLoading()) {
+  <p>Loading your usage…</p>
+} @else if (errorMessage()) {
+  <p class="error-message">{{ errorMessage() }}</p>
+} @else if (monthlyUsage().length === 0) {
+  <p>No usage data yet.</p>
+} @else {
+  <div class="stat-grid">
+    <div class="stat-card">
+      <h2>Total ({{ monthlyUsage().length }} months)</h2>
+      <p class="stat-value">{{ totalKwh() | number }} kWh</p>
+    </div>
+    <div class="stat-card">
+      <h2>Monthly Average</h2>
+      <p class="stat-value">{{ averageKwh() | number: '1.0-0' }} kWh</p>
+    </div>
+    @if (peakMonth(); as peak) {
+      <div class="stat-card">
+        <h2>Peak Month</h2>
+        <p class="stat-value">{{ peak.kwh | number }} kWh</p>
+        <p>{{ peak.month | date: 'MMMM y' : 'UTC' }}</p>
+      </div>
+    }
+  </div>
+
+  <!-- Bar chart. Hover a bar for its exact value; the table below has every number. -->
+  <div class="chart" role="img" aria-label="Bar chart of monthly electricity usage in kWh">
+    @for (m of monthlyUsage(); track m.month) {
+      <div class="bar-column" [attr.title]="(m.month | date: 'MMMM y' : 'UTC') + ': ' + (m.kwh | number) + ' kWh'">
+        <div class="bar-track">
+          <div
+            class="bar"
+            [class.peak]="m.month === peakMonth()?.month"
+            [style.height.%]="maxKwh() > 0 ? (m.kwh / maxKwh()) * 100 : 0"
+          ></div>
+        </div>
+        <span class="bar-label">{{ m.month | date: 'MMM' : 'UTC' }}</span>
+      </div>
+    }
+  </div>
+
+  <table class="usage-table">
+    <thead>
+      <tr><th>Month</th><th>Usage (kWh)</th></tr>
+    </thead>
+    <tbody>
+      @for (m of monthlyUsage(); track m.month) {
+        <tr>
+          <td>{{ m.month | date: 'MMMM y' : 'UTC' }}</td>
+          <td>{{ m.kwh | number }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

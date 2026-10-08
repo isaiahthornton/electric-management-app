@@ -1,6 +1,6 @@
 import { Service, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of, switchMap } from 'rxjs';
 import { Meter } from '../interfaces/meter';
 import { API_URL } from '../utils/api';
 import { MeterReading } from '../interfaces/meter-reading';
@@ -20,6 +20,11 @@ export class MeterService {
   getReadingsByMeter(meterId: number): Observable<MeterReading[]> {
     return this.http.get<MeterReading[]>(
       `${this.readingsUrl}?meterId=${meterId}&_sort=readingDate&_order=asc`,
+    );
+  }
+  getReadingsByCustomer(customerId: number): Observable<MeterReading[]> {
+    return this.getMetersByCustomer(customerId).pipe(
+      switchMap((meters) => (meters.length > 0 ? this.getReadingsByMeter(meters[0].id) : of([]))),
     );
   }
 }

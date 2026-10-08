@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { OutageService } from './outage-service';
+import { OutageService } from '../outage-service';
 
 describe('OutageService', () => {
   let service: OutageService;

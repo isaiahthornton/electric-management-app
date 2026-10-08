@@ -23,6 +23,12 @@ export const routes: Routes = [
         loadComponent: () => import('./components/account/account-dashboard/account-dashboard').then((m) => m.AccountDashboard),
         title: 'My Account | Thornton Energy',
       },
+      {
+        path: 'usage',
+        loadComponent: () =>
+          import('./components/account/usage-history/usage-history').then((m) => m.UsageHistory),
+        title: 'Usage | Thornton Energy',
+      },
     ]
   },
   {

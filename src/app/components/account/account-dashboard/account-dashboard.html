@@ -1,2 +1,53 @@
-<h1>My Account Dashboard</h1>
-<p>Welcome to your account dashboard!</p>
+@if (isLoading()) {
+  <p>Loading your account…</p>
+} @else if (errorMessage()) {
+  <p class="error-message">{{ errorMessage() }}</p>
+} @else {
+  <h1>Welcome back, {{ customer()?.firstName }}</h1>
+  <p class="account-info">
+    Account {{ customer()?.accountNumber }} · {{ customer()?.serviceAddress }}
+  </p>
+
+  @for (outage of activeOutages(); track outage.id) {
+    <div class="outage-banner">
+      <strong>Active outage reported {{ outage.timeReported | date: 'MMM d, h:mm a' }}</strong>
+      <p>{{ outage.description }}</p>
+      <p>Status: {{ outage.status }}</p>
+      <a routerLink="/account/outages">View outage details</a>
+    </div>
+  }
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <h2>Balance Due</h2>
+      <p class="stat-value">{{ balanceDue() | currency }}</p>
+      @if (nextDueDate(); as due) {
+        <p>Due {{ due | date: 'MMM d, y' : 'UTC' }}</p>
+      } @else {
+        <p>You're all paid up.</p>
+      }
+      @if (hasOverdue()) {
+        <p class="warning">You have an overdue bill.</p>
+      }
+      <a routerLink="/account/billing">View bills</a>
+    </div>
+
+    <div class="stat-card">
+      <h2>This Month's Usage</h2>
+      @if (thisMonth(); as current) {
+        <p class="stat-value">{{ current.kwh | number }} kWh</p>
+        <p>{{ current.month | date: 'MMMM y' : 'UTC' }}</p>
+        @let change = usageChange();
+        @if (change !== null) {
+          <p>
+            {{ change > 0 ? 'Up' : 'Down' }}
+            {{ (change < 0 ? -change : change) | number: '1.0-1' }}% from last month
+          </p>
+        }
+      } @else {
+        <p>No usage data yet.</p>
+      }
+      <a routerLink="/account/usage">View usage history</a>
+    </div>
+  </div>
+}
