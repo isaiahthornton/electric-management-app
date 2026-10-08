@@ -76,25 +76,271 @@
       "meterNumber": "MTR-5001",
       "installationDate": "2022-03-14",
       "status": "active"
+    },
+    {
+      "id": 2,
+      "customerId": 2,
+      "meterNumber": "MTR-5002",
+      "installationDate": "2024-06-02",
+      "status": "active"
     }
   ],
   "meterReadings": [
     {
       "id": 1,
       "meterId": 1,
-      "readingDate": "2026-09-01",
-      "readingValue": 15200
+      "readingDate": "2025-10-01",
+      "readingValue": 8800
     },
     {
       "id": 2,
       "meterId": 1,
+      "readingDate": "2025-11-01",
+      "readingValue": 9320
+    },
+    {
+      "id": 3,
+      "meterId": 1,
+      "readingDate": "2025-12-01",
+      "readingValue": 9930
+    },
+    {
+      "id": 4,
+      "meterId": 1,
+      "readingDate": "2026-01-01",
+      "readingValue": 10710
+    },
+    {
+      "id": 5,
+      "meterId": 1,
+      "readingDate": "2026-02-01",
+      "readingValue": 11550
+    },
+    {
+      "id": 6,
+      "meterId": 1,
+      "readingDate": "2026-03-01",
+      "readingValue": 12310
+    },
+    {
+      "id": 7,
+      "meterId": 1,
+      "readingDate": "2026-04-01",
+      "readingValue": 12910
+    },
+    {
+      "id": 8,
+      "meterId": 1,
+      "readingDate": "2026-05-01",
+      "readingValue": 13420
+    },
+    {
+      "id": 9,
+      "meterId": 1,
+      "readingDate": "2026-06-01",
+      "readingValue": 13980
+    },
+    {
+      "id": 10,
+      "meterId": 1,
+      "readingDate": "2026-07-01",
+      "readingValue": 14700
+    },
+    {
+      "id": 11,
+      "meterId": 1,
+      "readingDate": "2026-08-01",
+      "readingValue": 15590
+    },
+    {
+      "id": 12,
+      "meterId": 1,
+      "readingDate": "2026-09-01",
+      "readingValue": 16450
+    },
+    {
+      "id": 13,
+      "meterId": 1,
       "readingDate": "2026-10-01",
-      "readingValue": 15840
+      "readingValue": 17090
+    },
+    {
+      "id": 14,
+      "meterId": 2,
+      "readingDate": "2026-06-01",
+      "readingValue": 4100
+    },
+    {
+      "id": 15,
+      "meterId": 2,
+      "readingDate": "2026-07-01",
+      "readingValue": 4580
+    },
+    {
+      "id": 16,
+      "meterId": 2,
+      "readingDate": "2026-08-01",
+      "readingValue": 5230
+    },
+    {
+      "id": 17,
+      "meterId": 2,
+      "readingDate": "2026-09-01",
+      "readingValue": 5860
+    },
+    {
+      "id": 18,
+      "meterId": 2,
+      "readingDate": "2026-10-01",
+      "readingValue": 6360
     }
   ],
   "bills": [
     {
       "id": 1,
+      "customerId": 1,
+      "periodStart": "2025-10-01",
+      "periodEnd": "2025-10-31",
+      "kwhUsed": 520,
+      "energyCharge": 93.6,
+      "serviceCharge": 20,
+      "amountDue": 113.6,
+      "dueDate": "2025-11-21",
+      "status": "paid",
+      "paidDate": "2025-11-15"
+    },
+    {
+      "id": 2,
+      "customerId": 1,
+      "periodStart": "2025-11-01",
+      "periodEnd": "2025-11-30",
+      "kwhUsed": 610,
+      "energyCharge": 109.8,
+      "serviceCharge": 20,
+      "amountDue": 129.8,
+      "dueDate": "2025-12-21",
+      "status": "paid",
+      "paidDate": "2025-12-15"
+    },
+    {
+      "id": 3,
+      "customerId": 1,
+      "periodStart": "2025-12-01",
+      "periodEnd": "2025-12-31",
+      "kwhUsed": 780,
+      "energyCharge": 140.4,
+      "serviceCharge": 20,
+      "amountDue": 160.4,
+      "dueDate": "2026-01-21",
+      "status": "paid",
+      "paidDate": "2026-01-15"
+    },
+    {
+      "id": 4,
+      "customerId": 1,
+      "periodStart": "2026-01-01",
+      "periodEnd": "2026-01-31",
+      "kwhUsed": 840,
+      "energyCharge": 151.2,
+      "serviceCharge": 20,
+      "amountDue": 171.2,
+      "dueDate": "2026-02-21",
+      "status": "paid",
+      "paidDate": "2026-02-15"
+    },
+    {
+      "id": 5,
+      "customerId": 1,
+      "periodStart": "2026-02-01",
+      "periodEnd": "2026-02-28",
+      "kwhUsed": 760,
+      "energyCharge": 136.8,
+      "serviceCharge": 20,
+      "amountDue": 156.8,
+      "dueDate": "2026-03-21",
+      "status": "paid",
+      "paidDate": "2026-03-15"
+    },
+    {
+      "id": 6,
+      "customerId": 1,
+      "periodStart": "2026-03-01",
+      "periodEnd": "2026-03-31",
+      "kwhUsed": 600,
+      "energyCharge": 108.0,
+      "serviceCharge": 20,
+      "amountDue": 128.0,
+      "dueDate": "2026-04-21",
+      "status": "paid",
+      "paidDate": "2026-04-15"
+    },
+    {
+      "id": 7,
+      "customerId": 1,
+      "periodStart": "2026-04-01",
+      "periodEnd": "2026-04-30",
+      "kwhUsed": 510,
+      "energyCharge": 91.8,
+      "serviceCharge": 20,
+      "amountDue": 111.8,
+      "dueDate": "2026-05-21",
+      "status": "paid",
+      "paidDate": "2026-05-15"
+    },
+    {
+      "id": 8,
+      "customerId": 1,
+      "periodStart": "2026-05-01",
+      "periodEnd": "2026-05-31",
+      "kwhUsed": 560,
+      "energyCharge": 100.8,
+      "serviceCharge": 20,
+      "amountDue": 120.8,
+      "dueDate": "2026-06-21",
+      "status": "paid",
+      "paidDate": "2026-06-15"
+    },
+    {
+      "id": 9,
+      "customerId": 1,
+      "periodStart": "2026-06-01",
+      "periodEnd": "2026-06-30",
+      "kwhUsed": 720,
+      "energyCharge": 129.6,
+      "serviceCharge": 20,
+      "amountDue": 149.6,
+      "dueDate": "2026-07-21",
+      "status": "paid",
+      "paidDate": "2026-07-15"
+    },
+    {
+      "id": 10,
+      "customerId": 1,
+      "periodStart": "2026-07-01",
+      "periodEnd": "2026-07-31",
+      "kwhUsed": 890,
+      "energyCharge": 160.2,
+      "serviceCharge": 20,
+      "amountDue": 180.2,
+      "dueDate": "2026-08-21",
+      "status": "paid",
+      "paidDate": "2026-08-15"
+    },
+    {
+      "id": 11,
+      "customerId": 1,
+      "periodStart": "2026-08-01",
+      "periodEnd": "2026-08-31",
+      "kwhUsed": 860,
+      "energyCharge": 154.8,
+      "serviceCharge": 20,
+      "amountDue": 174.8,
+      "dueDate": "2026-09-21",
+      "status": "paid",
+      "paidDate": "2026-09-15"
+    },
+    {
+      "id": 12,
       "customerId": 1,
       "periodStart": "2026-09-01",
       "periodEnd": "2026-09-30",
@@ -105,7 +351,87 @@
       "dueDate": "2026-10-21",
       "status": "unpaid",
       "paidDate": null
+    },
+    {
+      "id": 13,
+      "customerId": 2,
+      "periodStart": "2026-06-01",
+      "periodEnd": "2026-06-30",
+      "kwhUsed": 480,
+      "energyCharge": 72.0,
+      "serviceCharge": 15,
+      "amountDue": 87.0,
+      "dueDate": "2026-07-21",
+      "status": "paid",
+      "paidDate": "2026-07-15"
+    },
+    {
+      "id": 14,
+      "customerId": 2,
+      "periodStart": "2026-07-01",
+      "periodEnd": "2026-07-31",
+      "kwhUsed": 650,
+      "energyCharge": 97.5,
+      "serviceCharge": 15,
+      "amountDue": 112.5,
+      "dueDate": "2026-08-21",
+      "status": "paid",
+      "paidDate": "2026-08-15"
+    },
+    {
+      "id": 15,
+      "customerId": 2,
+      "periodStart": "2026-08-01",
+      "periodEnd": "2026-08-31",
+      "kwhUsed": 630,
+      "energyCharge": 94.5,
+      "serviceCharge": 15,
+      "amountDue": 109.5,
+      "dueDate": "2026-09-21",
+      "status": "overdue",
+      "paidDate": null
+    },
+    {
+      "id": 16,
+      "customerId": 2,
+      "periodStart": "2026-09-01",
+      "periodEnd": "2026-09-30",
+      "kwhUsed": 500,
+      "energyCharge": 75.0,
+      "serviceCharge": 15,
+      "amountDue": 90.0,
+      "dueDate": "2026-10-21",
+      "status": "unpaid",
+      "paidDate": null
     }
   ],
-  "outages": []
+  "outages": [
+    {
+      "id": 1,
+      "customerId": 1,
+      "address": "12 Maple Ave, East Windsor, NJ",
+      "description": "Power out after storm, whole street dark",
+      "timeReported": "2026-08-14T19:42:00",
+      "timeResolved": "2026-08-14T23:10:00",
+      "status": "resolved"
+    },
+    {
+      "id": 2,
+      "customerId": 1,
+      "address": "12 Maple Ave, East Windsor, NJ",
+      "description": "Lights flickering and partial outage in kitchen and garage",
+      "timeReported": "2026-10-06T08:15:00",
+      "timeResolved": null,
+      "status": "in_progress"
+    },
+    {
+      "id": 3,
+      "customerId": 2,
+      "address": "45 Oak St, East Windsor, NJ",
+      "description": "Transformer noise and brief outage",
+      "timeReported": "2026-09-20T13:05:00",
+      "timeResolved": "2026-09-20T16:30:00",
+      "status": "resolved"
+    }
+  ]
 }
