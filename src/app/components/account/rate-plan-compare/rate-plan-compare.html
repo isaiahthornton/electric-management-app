@@ -1,0 +1,58 @@
+<h1>Rate Plans</h1>
+
+@if (isLoading()) {
+  <p>Loading plans…</p>
+} @else if (errorMessage()) {
+  <p class="error-message">{{ errorMessage() }}</p>
+} @else {
+  <p>
+    Estimates are based on your average usage of
+    <strong>{{ averageKwh() | number: '1.0-0' }} kWh/month</strong>.
+  </p>
+
+  @if (successMessage()) {
+    <p class="success-message">{{ successMessage() }}</p>
+  }
+
+  <div class="plan-grid">
+    @for (estimate of estimates(); track estimate.plan.id) {
+      @let savings = savingsVsCurrent(estimate);
+      <div class="plan-card" [class.current]="estimate.isCurrent">
+        @if (estimate.isCurrent) {
+          <span class="badge">Current plan</span>
+        } @else if (estimate.plan.id === cheapestPlanId()) {
+          <span class="badge best">Lowest estimate</span>
+        }
+
+        <h2>{{ estimate.plan.name }}</h2>
+        <p>{{ estimate.plan.description }}</p>
+        <p class="muted">
+          {{ estimate.plan.pricePerKwh | currency }}/kWh + {{ estimate.plan.monthlyFee | currency }}/month
+        </p>
+
+        <p class="stat-value">{{ estimate.monthlyCost | currency }}<span class="muted">/month est.</span></p>
+
+        @if (!estimate.isCurrent) {
+          @if (savings > 0) {
+            <p class="savings">Save about {{ savings | currency }}/month</p>
+          } @else {
+            <p class="muted">About {{ -savings | currency }}/month more</p>
+          }
+
+          <button
+            type="button"
+            (click)="switchPlan(estimate.plan)"
+            [disabled]="switchingPlanId() !== null"
+          >
+            {{ switchingPlanId() === estimate.plan.id ? 'Switching…' : 'Switch to ' + estimate.plan.name }}
+          </button>
+        }
+      </div>
+    }
+  </div>
+
+  <p class="muted">
+    Estimates use your 12-month average at each plan's standard rate. Time-of-Use savings depend
+    on how much energy you use during off-peak hours.
+  </p>
+}

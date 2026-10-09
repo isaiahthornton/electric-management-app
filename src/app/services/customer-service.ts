@@ -13,4 +13,8 @@ export class CustomerService {
   getCustomerById(customerId: number): Observable<Customer> {
     return this.http.get<Customer>(`${this.url}/${customerId}`);
   }
+  // Only changes ratePlanId; the rest of the customer record is left alone
+  updateRatePlan(customerId: number, ratePlanId: number): Observable<Customer> {
+    return this.http.patch<Customer>(`${this.url}/${customerId}`, { ratePlanId });
+  }
 }
