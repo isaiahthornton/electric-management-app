@@ -1,5 +1,6 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
+import { StatusLabelPipe } from '../../../pipes/status-label-pipe';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
@@ -20,7 +21,7 @@ import { calculateMonthlyUsage } from '../../../utils/usage';
  * the balance, usage trend, and any open outages from that data.
  */
 @Component({
-  imports: [CurrencyPipe, DatePipe, DecimalPipe, RouterLink],
+  imports: [CurrencyPipe, DatePipe, DecimalPipe, RouterLink, StatusLabelPipe],
   selector: 'app-account-dashboard',
   styleUrl: './account-dashboard.css',
   templateUrl: './account-dashboard.html',

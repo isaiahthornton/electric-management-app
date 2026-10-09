@@ -14,4 +14,8 @@ export class OutageService {
       `${this.url}?customerId=${customerId}&_sort=timeReported&_order=desc`,
     );
   }
+  // POST creates a new record; json-server assigns the id and returns the saved outage
+  reportOutage(outage: Omit<Outage, 'id'>): Observable<Outage> {
+    return this.http.post<Outage>(this.url, outage);
+  }
 }

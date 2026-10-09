@@ -12,7 +12,7 @@
     <div class="outage-banner">
       <strong>Active outage reported {{ outage.timeReported | date: 'MMM d, h:mm a' }}</strong>
       <p>{{ outage.description }}</p>
-      <p>Status: {{ outage.status }}</p>
+      <p>Status: {{ outage.status | statusLabel }}</p>
       <a routerLink="/account/outages">View outage details</a>
     </div>
   }

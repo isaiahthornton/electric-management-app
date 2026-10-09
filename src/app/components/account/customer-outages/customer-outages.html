@@ -1,0 +1,63 @@
+<h1>Outages</h1>
+
+<p class="safety-note">
+  If you see downed power lines, stay at least 30 feet away and call our 24/7 outage line at
+  1-800-555-1234.
+</p>
+
+@if (isLoading()) {
+  <p>Loading…</p>
+} @else if (errorMessage()) {
+  <p class="error-message">{{ errorMessage() }}</p>
+} @else {
+  <section class="report-form">
+    <h2>Report an Outage</h2>
+
+    <form [formGroup]="form" (ngSubmit)="reportOutage()">
+      <label>
+        Address
+        <input formControlName="address" />
+      </label>
+      @if (form.controls.address.touched && form.controls.address.invalid) {
+        <p class="field-error">Please enter the address of the outage.</p>
+      }
+
+      <label>
+        What's happening?
+        <textarea formControlName="description" rows="4"
+          placeholder="e.g. Power went out at 7pm, whole street is dark"></textarea>
+      </label>
+      <p class="hint">{{ form.controls.description.value.length }}/300</p>
+      @if (form.controls.description.touched && form.controls.description.invalid) {
+        <p class="field-error">Please describe the outage (10–300 characters).</p>
+      }
+
+      <button type="submit" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Submitting…' : 'Report Outage' }}
+      </button>
+
+      @if (submitError()) {
+        <p class="error-message">{{ submitError() }}</p>
+      }
+      @if (successMessage()) {
+        <p class="success-message">{{ successMessage() }}</p>
+      }
+    </form>
+  </section>
+
+  <section class="outage-list">
+    <h2>Your Reports</h2>
+    @for (outage of outages(); track outage.id) {
+      <div class="outage-card">
+        <p><strong>{{ outage.status | statusLabel }}</strong> · Reported {{ outage.timeReported | date: 'MMM d, y, h:mm a' }}</p>
+        <p>{{ outage.description }}</p>
+        <p class="muted">{{ outage.address }}</p>
+        @if (outage.timeResolved) {
+          <p class="muted">Resolved {{ outage.timeResolved | date: 'MMM d, h:mm a' }}</p>
+        }
+      </div>
+    } @empty {
+      <p>You haven't reported any outages.</p>
+    }
+  </section>
+}

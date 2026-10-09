@@ -1,0 +1,45 @@
+<a routerLink="/account/billing">← Back to billing history</a>
+
+@if (isLoading()) {
+  <p>Loading bill…</p>
+} @else if (errorMessage()) {
+  <p class="error-message">{{ errorMessage() }}</p>
+} @else if (bill(); as b) {
+  <h1>Bill for {{ b.periodStart | date: 'MMMM y' : 'UTC' }}</h1>
+  <p>
+    Service period {{ b.periodStart | date: 'MMM d' : 'UTC' }} –
+    {{ b.periodEnd | date: 'MMM d, y' : 'UTC' }}
+  </p>
+
+  <table class="line-items">
+    <tbody>
+      <tr>
+        <td>Energy charge ({{ b.kwhUsed }} kWh)</td>
+        <td>{{ b.energyCharge | currency }}</td>
+      </tr>
+      <tr>
+        <td>Monthly service charge</td>
+        <td>{{ b.serviceCharge | currency }}</td>
+      </tr>
+      <tr class="total">
+        <td>Total</td>
+        <td>{{ b.amountDue | currency }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>Status: <span class="status">{{ b.status | titlecase }}</span></p>
+
+  @if (b.status === 'paid') {
+    <p>Paid on {{ b.paidDate | date: 'MMM d, y' : 'UTC' }}</p>
+  } @else {
+    <p>Due {{ b.dueDate | date: 'MMM d, y' : 'UTC' }}</p>
+    <button type="button" (click)="payBill()" [disabled]="isPaying()">
+      {{ isPaying() ? 'Processing…' : 'Pay ' + (b.amountDue | currency) + ' Now' }}
+    </button>
+  }
+
+  @if (successMessage()) {
+    <p class="success-message">{{ successMessage() }}</p>
+  }
+}

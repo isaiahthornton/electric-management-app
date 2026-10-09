@@ -1,0 +1,49 @@
+<h1>Billing History</h1>
+
+@if (isLoading()) {
+  <p>Loading your bills…</p>
+} @else if (errorMessage()) {
+  <p class="error-message">{{ errorMessage() }}</p>
+} @else {
+  <div class="filter-bar">
+    @for (f of filters; track f) {
+      <button
+        type="button"
+        [class.active]="activeFilter() === f"
+        [attr.aria-pressed]="activeFilter() === f"
+        (click)="activeFilter.set(f)"
+      >
+        {{ f | titlecase }}
+      </button>
+    }
+  </div>
+
+  @if (filteredBills().length === 0) {
+    <p>No {{ activeFilter() }} bills.</p>
+  } @else {
+    <table class="bill-table">
+      <thead>
+        <tr>
+          <th>Billing Period</th>
+          <th>Usage</th>
+          <th>Amount</th>
+          <th>Due Date</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (bill of filteredBills(); track bill.id) {
+          <tr>
+            <td>{{ bill.periodStart | date: 'MMMM y' : 'UTC' }}</td>
+            <td>{{ bill.kwhUsed }} kWh</td>
+            <td>{{ bill.amountDue | currency }}</td>
+            <td>{{ bill.dueDate | date: 'MMM d, y' : 'UTC' }}</td>
+            <td><span class="status">{{ bill.status | titlecase }}</span></td>
+            <td><a [routerLink]="['/account/billing', bill.id]">View</a></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+}

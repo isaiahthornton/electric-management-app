@@ -29,6 +29,24 @@ export const routes: Routes = [
           import('./components/account/usage-history/usage-history').then((m) => m.UsageHistory),
         title: 'Usage | Thornton Energy',
       },
+      {
+        path: 'billing',
+        loadComponent: () =>
+          import('./components/account/billing-history/billing-history').then((m) => m.BillingHistory),
+        title: 'Billing | Thornton Energy',
+      },
+      {
+        path: 'billing/:id',
+        loadComponent: () =>
+          import('./components/account/bill-detail/bill-detail').then((m) => m.BillDetail),
+        title: 'Bill Details | Thornton Energy',
+      },
+      {
+        path: 'outages',
+        loadComponent: () =>
+          import('./components/account/customer-outages/customer-outages').then((m) => m.CustomerOutages),
+        title: 'Outages | Thornton Energy',
+      },
     ]
   },
   {
