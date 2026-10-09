@@ -43,7 +43,11 @@ export class Login {
       error: (err) => {
         this.isLoading.set(false);
         console.error('Login error:', err);
-        this.errorMessage.set('An error occurred during login. Please try again later.');
+        // Our own errors (like a suspended account) have a message worth showing;
+        // anything else means the server couldn't be reached
+        this.errorMessage.set(
+          err instanceof Error ? err.message : 'An error occurred during login. Please try again later.',
+        );
       },
     });
   }

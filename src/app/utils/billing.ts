@@ -1,5 +1,6 @@
 import { Bill } from '../interfaces/bill';
 import { RatePlan } from '../interfaces/rate-plan';
+import { todayIso } from './dates';
 
 // Money is rounded to cents at each step, like a real bill
 const roundToCents = (n: number) => Math.round(n * 100) / 100;
@@ -47,4 +48,10 @@ export function buildBill(
     status: 'unpaid',
     paidDate: null,
   };
+}
+
+// An unpaid bill whose due date has passed is overdue. Applied when bills load,
+// so "overdue" is always current instead of depending on what's saved in db.json.
+export function withOverdueStatus(bill: Bill, today: string = todayIso()): Bill {
+  return bill.status === 'unpaid' && bill.dueDate < today ? { ...bill, status: 'overdue' } : bill;
 }

@@ -67,6 +67,14 @@ npm run reset-db
 
 This copies `db.seed.json` over `db.json`. The API picks up the change automatically. Log out and back in afterward if you were signed in.
 
+### Run the tests
+
+```bash
+npm test -- --watch=false
+```
+
+Unit tests use Vitest. They cover the auth guard (logged out, wrong role, right role), login (password never stored, suspended accounts blocked), bill payment and overdue detection, billing math, usage calculation, the password-match validator, the status pipe and directive, and that every page component can be created. The API does not need to be running.
+
 ---
 
 ## Demo accounts
@@ -169,6 +177,9 @@ src/app/
 - **`todayIso()` and `nowIso()` build dates from local time**, because `toISOString()` is UTC and would stamp the next day after 8 pm in New York.
 - **json-server's cascade delete is turned off** (`--fks _fk`). By default, deleting a record also deletes everything that references it, and the admin user's `customerId: null` crashed that check.
 - **Login only follows in-app `returnUrl` paths** (starting with a single `/`), which prevents an open redirect to another site.
+- **Overdue is calculated, not stored.** `BillService` marks any unpaid bill past its due date as `overdue` when bills load, so the status is always current.
+- **The password never reaches `sessionStorage`.** `AuthService` saves the user record without it (`SessionUser = Omit<User, 'password'>`).
+- **Suspended and closed accounts can't log in.** Login checks the customer's account status and shows a customer-care message instead.
 - **Customers can't open other customers' bills** by typing an id into the URL; the bill page checks ownership.
 
 ---
@@ -187,7 +198,6 @@ This is a front-end demo with a mock API, so some things a production utility po
 - Replace json-server with an **ASP.NET Core Web API + Entity Framework Core** (the interfaces map directly to C# entities)
 - Move `API_URL` into Angular environment files for dev/prod
 - Add an HTTP interceptor for global error handling
-- Mark bills overdue automatically when their due date passes
 
 ---
 
