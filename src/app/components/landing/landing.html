@@ -1,13 +1,63 @@
 <section class="hero">
-  <h1>Powering East Windsor and Beyond</h1>
-  <p>
-    Thornton Energy Inc. is a leading provider of sustainable energy solutions, dedicated to
-    delivering innovative and efficient energy systems for residential, commercial, and
-    industrial applications.
-  </p>
-  <div class="hero-actions">
-    <a routerLink="/login" class="btn btn-primary">Log In to Your Account</a>
-    <a routerLink="/login" class="btn btn-secondary">Report an Outage</a>
+  <div class="hero-copy">
+    <h1>Power for East Windsor, Hightstown, and the towns between</h1>
+    <p>
+      Thornton Energy keeps 48,000 homes and businesses running across central New Jersey. Pay
+      your bill, track your usage, and report an outage in a few clicks.
+    </p>
+    <div class="hero-actions">
+      @if (currentUser()) {
+        <a [routerLink]="accountLink()" class="btn btn-primary">Go to my account</a>
+      } @else {
+        <a routerLink="/login" class="btn btn-primary">Log in to your account</a>
+      }
+      <a [routerLink]="outageLink()" [queryParams]="outageQuery()" class="btn btn-secondary">
+        Report an outage
+      </a>
+    </div>
+  </div>
+
+  <div class="hero-photo">
+    <img
+      ngSrc="images/hero.jpg"
+      fill
+      priority
+      sizes="(max-width: 800px) 100vw, 45vw"
+      alt="Power lines crossing open farmland at sunset"
+    />
+  </div>
+</section>
+
+<section class="grid-facts" aria-label="Thornton Energy by the numbers">
+  @for (fact of facts; track fact.label) {
+    <div class="fact">
+      <span class="fact-value">{{ fact.value }}</span>
+      <span class="fact-label">{{ fact.label }}</span>
+    </div>
+  }
+</section>
+
+<section class="values">
+  <div class="values-photo">
+    <img
+      ngSrc="images/crew.jpg"
+      fill
+      sizes="(max-width: 800px) 100vw, 40vw"
+      alt="A utility crew member working on a power line from a bucket truck"
+    />
+  </div>
+  <div class="values-copy">
+    <h2>What we're here to do</h2>
+    <p class="lead">
+      Keep the lights on, keep crews safe, and move the grid toward cleaner power without raising
+      your bill.
+    </p>
+    @for (value of values; track value.title) {
+      <div class="value">
+        <h3>{{ value.title }}</h3>
+        <p>{{ value.text }}</p>
+      </div>
+    }
   </div>
 </section>
 
@@ -22,4 +72,17 @@
   } @empty {
     <p>Loading plans…</p>
   }
+</section>
+
+<section class="outage-cta safety-note">
+  <div>
+    <h2>Power out?</h2>
+    <p>
+      Report it online and follow the repair, or call 1-800-555-1234 any time. Stay at least 30 feet
+      away from downed lines.
+    </p>
+  </div>
+  <a [routerLink]="outageLink()" [queryParams]="outageQuery()" class="btn btn-primary">
+    Report an outage
+  </a>
 </section>

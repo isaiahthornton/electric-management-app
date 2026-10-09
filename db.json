@@ -54,7 +54,7 @@
       "phone": "609-555-0101",
       "email": "jane@example.com",
       "serviceAddress": "12 Maple Ave, East Windsor, NJ",
-      "ratePlanId": 1,
+      "ratePlanId": 2,
       "status": "active"
     },
     {
@@ -400,8 +400,8 @@
       "serviceCharge": 15,
       "amountDue": 109.5,
       "dueDate": "2026-09-21",
-      "status": "overdue",
-      "paidDate": null
+      "status": "paid",
+      "paidDate": "2026-10-08"
     },
     {
       "id": 16,

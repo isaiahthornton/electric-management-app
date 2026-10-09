@@ -1,0 +1,147 @@
+/* Hero: copy on the left, photo on the right */
+.hero {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 40px;
+  align-items: center;
+  padding: 48px;
+}
+
+.hero-photo,
+.values-photo {
+  position: relative; /* required by NgOptimizedImage's fill mode */
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.hero-photo {
+  aspect-ratio: 4 / 3;
+  background: #24496b; /* shows while the photo loads */
+}
+
+.values-photo {
+  aspect-ratio: 3 / 4;
+  background: var(--rule);
+}
+
+.hero-photo img,
+.values-photo img {
+  object-fit: cover; /* crop to fill the box instead of stretching */
+}
+
+/* Facts strip: one bordered row, divided into three */
+.grid-facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  margin-bottom: 56px;
+}
+
+.fact {
+  display: grid;
+  gap: 2px;
+  padding: 20px 24px;
+  border-left: 1px solid var(--rule);
+}
+
+.fact:first-child {
+  border-left: none;
+}
+
+.fact-value {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--grid-navy);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.fact-label {
+  color: var(--ink-muted);
+  font-size: 0.95rem;
+}
+
+/* Mission and values */
+.values {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 48px;
+  align-items: center;
+  margin-bottom: 56px;
+}
+
+.lead {
+  font-size: 1.15rem;
+  margin-bottom: 20px;
+}
+
+.value {
+  padding: 14px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.value h3 {
+  margin-bottom: 4px;
+}
+
+.value p {
+  margin: 0;
+  color: var(--ink-muted);
+}
+
+.plans {
+  margin-bottom: 56px;
+}
+
+/* Outage call to action: uses the global hazard-stripe .safety-note */
+.outage-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px 28px 24px 40px;
+}
+
+.outage-cta h2 {
+  margin-bottom: 4px;
+}
+
+.outage-cta p {
+  margin: 0;
+}
+
+.outage-cta .btn {
+  margin: 0;
+}
+
+@media (max-width: 800px) {
+  .hero,
+  .values {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    padding: 32px 24px;
+  }
+
+  .grid-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .fact {
+    border-left: none;
+    border-top: 1px solid var(--rule);
+  }
+
+  .fact:first-child {
+    border-top: none;
+  }
+
+  .values-photo {
+    aspect-ratio: 16 / 9; /* a short strip on phones instead of a tall photo */
+  }
+}

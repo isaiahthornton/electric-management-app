@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth-service';
 
 @Component({
@@ -13,6 +13,7 @@ import { AuthService } from '../../services/auth-service';
 export class Login {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   protected readonly email = signal('');
   protected readonly password = signal('');
@@ -28,6 +29,13 @@ export class Login {
         this.isLoading.set(false);
         if (!user) {
           this.errorMessage.set('Invalid email or password. Please try again.');
+          return;
+        }
+        // Go back to the page that sent them here, if there was one
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+        // Only follow paths inside this app (like /account/billing), never a full web address
+        if (returnUrl?.startsWith('/') && !returnUrl.startsWith('//')) {
+          this.router.navigateByUrl(returnUrl);
           return;
         }
         this.router.navigate([user.role === 'admin' ? '/admin' : '/account']);
