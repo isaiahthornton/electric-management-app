@@ -24,4 +24,7 @@ export class BillService {
       paidDate: todayIso(),
     });
   }
+  getAllBills(): Observable<Bill[]> {
+  return this.http.get<Bill[]>(`${this.url}?_sort=periodStart&_order=desc`);
+  }
 }

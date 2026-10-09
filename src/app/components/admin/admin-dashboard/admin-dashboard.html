@@ -1,2 +1,60 @@
 <h1>Admin Dashboard</h1>
-<p>Welcome to the admin dashboard!</p>
+
+@if (isLoading()) {
+  <p>Loading…</p>
+} @else if (errorMessage()) {
+  <p class="error-message">{{ errorMessage() }}</p>
+} @else {
+  <div class="stat-grid">
+    <div class="stat-card">
+      <h2>Customers</h2>
+      <p class="stat-value">{{ customers().length }}</p>
+      <p>{{ activeCustomerCount() }} active</p>
+      <a routerLink="/admin/customers">Manage customers</a>
+    </div>
+
+    <div class="stat-card">
+      <h2>Outstanding Balance</h2>
+      <p class="stat-value">{{ outstandingBalance() | currency }}</p>
+      <p>{{ openBills().length }} open bills · {{ overdueCount() }} overdue</p>
+    </div>
+
+    <div class="stat-card">
+      <h2>Usage Billed</h2>
+      <p class="stat-value">{{ latestPeriodKwh() | number }} kWh</p>
+      @if (latestPeriod(); as period) {
+        <p>{{ period | date: 'MMMM y' : 'UTC' }}</p>
+      }
+    </div>
+
+    <div class="stat-card">
+      <h2>Active Outages</h2>
+      <p class="stat-value">{{ activeOutages().length }}</p>
+      @if (avgResolutionHours(); as hours) {
+        <p>Avg. repair time: {{ hours | number: '1.0-1' }} hrs</p>
+      }
+      <a routerLink="/admin/outages">Open outage queue</a>
+    </div>
+  </div>
+
+  <h2>Open Outages</h2>
+  @if (activeOutages().length === 0) {
+    <p>No active outages.</p>
+  } @else {
+    <table class="admin-table">
+      <thead>
+        <tr><th>Reported</th><th>Address</th><th>Description</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        @for (o of activeOutages(); track o.id) {
+          <tr>
+            <td>{{ o.timeReported | date: 'MMM d, h:mm a' }}</td>
+            <td>{{ o.address }}</td>
+            <td>{{ o.description }}</td>
+            <td>{{ o.status | statusLabel }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+}

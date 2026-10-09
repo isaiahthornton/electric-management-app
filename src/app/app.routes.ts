@@ -47,6 +47,12 @@ export const routes: Routes = [
           import('./components/account/customer-outages/customer-outages').then((m) => m.CustomerOutages),
         title: 'Outages | Thornton Energy',
       },
+      {
+        path: 'rate-plans',
+        loadComponent: () =>
+          import('./components/account/rate-plan-compare/rate-plan-compare').then((m) => m.RatePlanCompare),
+        title: 'Rate Plans | Thornton Energy',
+      },
     ]
   },
   {

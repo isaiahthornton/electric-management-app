@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Customer } from '../interfaces/customer';
 import { API_URL } from '../utils/api';
+import { AccountStatus } from '../interfaces/customer';
 
 
 @Service()
@@ -16,5 +17,11 @@ export class CustomerService {
   // Only changes ratePlanId; the rest of the customer record is left alone
   updateRatePlan(customerId: number, ratePlanId: number): Observable<Customer> {
     return this.http.patch<Customer>(`${this.url}/${customerId}`, { ratePlanId });
+  }
+  getAllCustomers(): Observable<Customer[]> {
+  return this.http.get<Customer[]>(`${this.url}?_sort=lastName&_order=asc`);
+  }
+  updateCustomerStatus(customerId: number, status: AccountStatus): Observable<Customer> {
+    return this.http.patch<Customer>(`${this.url}/${customerId}`, { status });
   }
 }
