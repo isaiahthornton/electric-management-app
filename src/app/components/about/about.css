@@ -1,0 +1,141 @@
+.about-intro {
+  margin-bottom: 40px;
+}
+
+.lead {
+  font-size: 1.15rem;
+}
+
+section {
+  margin-bottom: 48px;
+}
+
+/* Timeline: a vertical rule with the year sitting on it */
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 20px;
+  border-left: 3px solid var(--line-blue);
+  max-width: 720px;
+}
+
+.timeline li {
+  position: relative;
+  padding: 0 0 22px 20px;
+}
+
+.timeline li::before {
+  content: '';
+  position: absolute;
+  left: -29px;
+  top: 6px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 3px solid var(--line-blue);
+}
+
+.year {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--grid-navy);
+}
+
+.timeline p {
+  margin: 2px 0 0;
+}
+
+.towns {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.towns li {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-weight: 500;
+}
+
+.leaders {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+}
+
+.leader {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--grid-navy);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.leader h3 {
+  margin-bottom: 0;
+}
+
+.role {
+  font-weight: 600;
+  color: var(--line-blue);
+  margin-bottom: 4px;
+}
+
+/* Developer credit */
+.built-by {
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 28px;
+}
+
+.built-by img {
+  flex: none;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.stack {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.stack li {
+  font-size: 0.85rem;
+  background: var(--info-wash);
+  color: var(--line-blue-dark);
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+
+@media (max-width: 700px) {
+  .built-by {
+    flex-direction: column;
+  }
+}

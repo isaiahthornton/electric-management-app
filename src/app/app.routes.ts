@@ -92,6 +92,11 @@ export const routes: Routes = [
         loadComponent: () => import('./components/admin/admin-billing/admin-billing').then((m) => m.AdminBilling),
         title: 'Billing | Thornton Energy Admin',
       },
+      {
+        path: 'messages',
+        loadComponent: () => import('./components/admin/admin-messages/admin-messages').then((m) => m.AdminMessages),
+        title: 'Inbox | Thornton Energy Admin',
+      },
     ]
   },
   {

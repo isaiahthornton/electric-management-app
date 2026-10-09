@@ -1,2 +1,69 @@
-<h1>My name is John Doe, and I am the CEO of Thornton Energy Inc.</h1>
-<p>With over 20 years of experience in the energy sector, I have dedicated my career to advancing sustainable energy solutions that benefit both our customers and the environment.</p>
+<section class="about-intro">
+  <h1>About Thornton Energy</h1>
+  <p class="lead">
+    For more than seventy years we have kept central New Jersey's lights on: first for a few
+    hundred homes along Route 130, now for 48,000 homes and businesses across six towns.
+  </p>
+</section>
+
+<section class="timeline-section">
+  <h2>Our history</h2>
+  <ol class="timeline">
+    @for (event of timeline; track event.year) {
+      <li>
+        <span class="year">{{ event.year }}</span>
+        <p>{{ event.text }}</p>
+      </li>
+    }
+  </ol>
+</section>
+
+<section class="service-area">
+  <h2>Where we serve</h2>
+  <ul class="towns">
+    @for (town of towns; track town) {
+      <li>{{ town }}</li>
+    }
+  </ul>
+</section>
+
+<section class="leadership">
+  <h2>Leadership</h2>
+  <div class="leaders">
+    @for (leader of leaders; track leader.name) {
+      <div class="leader">
+        <span class="avatar" aria-hidden="true">{{ initials(leader.name) }}</span>
+        <div>
+          <h3>{{ leader.name }}</h3>
+          <p class="role">{{ leader.role }}</p>
+          <p class="muted">{{ leader.bio }}</p>
+        </div>
+      </div>
+    }
+  </div>
+</section>
+
+<section class="built-by">
+  <img ngSrc="images/isaiah.png" width="160" height="160" alt="Isaiah, developer of this application" />
+  <div>
+    <h2>Built by Isaiah</h2>
+    <p>
+      Thornton Energy is a fictional utility. I designed and built this application as a Project
+      for Revature's .NET Full Stack training, to show a complete customer portal and operations
+      back office in Angular.
+    </p>
+    <p class="muted">B.A. Information Technology and Informatics, Rutgers University, 2026</p>
+    <ul class="stack">
+      <li>Angular 22</li>
+      <li>TypeScript</li>
+      <li>RxJS</li>
+      <li>Signals</li>
+      <li>Reactive forms</li>
+      <li>json-server REST API</li>
+    </ul>
+    <p>
+      <a href="https://github.com/isaiahthornton/electric-management-app" target="_blank" rel="noopener">View the code on GitHub</a>
+      · <a href="https://www.linkedin.com/in/isaiah-thornton/" target="_blank" rel="noopener">LinkedIn</a>
+    </p>
+  </div>
+</section>
