@@ -193,6 +193,18 @@
       "meterId": 2,
       "readingDate": "2026-10-01",
       "readingValue": 6360
+    },
+    {
+      "meterId": 1,
+      "readingDate": "2026-11-01",
+      "readingValue": 17800,
+      "id": 19
+    },
+    {
+      "meterId": 2,
+      "readingDate": "2026-11-01",
+      "readingValue": 6900,
+      "id": 20
     }
   ],
   "bills": [
@@ -403,6 +415,32 @@
       "dueDate": "2026-10-21",
       "status": "unpaid",
       "paidDate": null
+    },
+    {
+      "customerId": 1,
+      "periodStart": "2026-10-01",
+      "periodEnd": "2026-10-31",
+      "kwhUsed": 710,
+      "energyCharge": 127.8,
+      "serviceCharge": 20,
+      "amountDue": 147.8,
+      "dueDate": "2026-11-21",
+      "status": "paid",
+      "paidDate": "2026-10-08",
+      "id": 17
+    },
+    {
+      "customerId": 2,
+      "periodStart": "2026-10-01",
+      "periodEnd": "2026-10-31",
+      "kwhUsed": 540,
+      "energyCharge": 81,
+      "serviceCharge": 15,
+      "amountDue": 96,
+      "dueDate": "2026-11-21",
+      "status": "unpaid",
+      "paidDate": null,
+      "id": 18
     }
   ],
   "outages": [
@@ -421,8 +459,8 @@
       "address": "12 Maple Ave, East Windsor, NJ",
       "description": "Lights flickering and partial outage in kitchen and garage",
       "timeReported": "2026-10-06T08:15:00",
-      "timeResolved": null,
-      "status": "in_progress"
+      "timeResolved": "2026-10-08T21:39:15",
+      "status": "resolved"
     },
     {
       "id": 3,

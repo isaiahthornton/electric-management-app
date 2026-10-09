@@ -25,6 +25,9 @@ export class BillService {
     });
   }
   getAllBills(): Observable<Bill[]> {
-  return this.http.get<Bill[]>(`${this.url}?_sort=periodStart&_order=desc`);
+    return this.http.get<Bill[]>(`${this.url}?_sort=periodStart&_order=desc`);
+  }
+  createBill(bill: Omit<Bill, 'id'>): Observable<Bill> {
+    return this.http.post<Bill>(this.url, bill);
   }
 }

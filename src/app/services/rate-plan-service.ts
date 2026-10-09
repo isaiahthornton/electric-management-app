@@ -12,4 +12,14 @@ export class RatePlanService {
   getRatePlans(): Observable<RatePlan[]> {
     return this.http.get<RatePlan[]>(this.url);
   }
+  createRatePlan(plan: Omit<RatePlan, 'id'>): Observable<RatePlan> {
+  return this.http.post<RatePlan>(this.url, plan);
+  }
+  // PUT replaces the whole record, so send every field
+  updateRatePlan(plan: RatePlan): Observable<RatePlan> {
+    return this.http.put<RatePlan>(`${this.url}/${plan.id}`, plan);
+  }
+  deleteRatePlan(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.url}/${id}`);
+  }
 }

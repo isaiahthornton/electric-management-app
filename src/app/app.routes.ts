@@ -65,7 +65,33 @@ export const routes: Routes = [
         path: '',
         loadComponent: () => import('./components/admin/admin-dashboard/admin-dashboard').then((m) => m.AdminDashboard),
         title: 'Admin Dashboard | Thornton Energy',
-      }
+      },
+      {
+        path: 'customers',
+        loadComponent: () =>
+          import('./components/admin/admin-customers/admin-customers').then((m) => m.AdminCustomers),
+        title: 'Customers | Thornton Energy Admin',
+      },
+      {
+        path: 'outages',
+        loadComponent: () => import('./components/admin/admin-outages/admin-outages').then((m) => m.AdminOutages),
+        title: 'Outage Queue | Thornton Energy Admin',
+      },
+      {
+        path: 'rate-plans',
+        loadComponent: () => import('./components/admin/admin-rate-plans/admin-rate-plans').then((m) => m.AdminRatePlans),
+        title: 'Rate Plans | Thornton Energy Admin',
+      },
+      {
+        path: 'meters',
+        loadComponent: () => import('./components/admin/admin-meters/admin-meters').then((m) => m.AdminMeters),
+        title: 'Meters | Thornton Energy Admin',
+      },
+      {
+        path: 'billing',
+        loadComponent: () => import('./components/admin/admin-billing/admin-billing').then((m) => m.AdminBilling),
+        title: 'Billing | Thornton Energy Admin',
+      },
     ]
   },
   {

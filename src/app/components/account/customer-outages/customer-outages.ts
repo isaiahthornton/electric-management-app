@@ -7,6 +7,7 @@ import { AuthService } from '../../../services/auth-service';
 import { CustomerService } from '../../../services/customer-service';
 import { OutageService } from '../../../services/outage-service';
 import { Outage } from '../../../interfaces/outage';
+import { StatusBadge } from '../../../directives/status-badge';
 import { StatusLabelPipe } from '../../../pipes/status-label-pipe';
 import { nowIso } from '../../../utils/dates';
 
@@ -15,7 +16,7 @@ import { nowIso } from '../../../utils/dates';
  * Customers report a new outage and see the status of past reports.
  */
 @Component({
-  imports: [DatePipe, ReactiveFormsModule, StatusLabelPipe],
+  imports: [DatePipe, ReactiveFormsModule, StatusBadge, StatusLabelPipe],
   selector: 'app-customer-outages',
   styleUrl: './customer-outages.css',
   templateUrl: './customer-outages.html',

@@ -4,12 +4,14 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth-service';
 import { BillService } from '../../../services/bill-service';
 import { Bill, BillStatus } from '../../../interfaces/bill';
+import { StatusBadge } from '../../../directives/status-badge';
+import { StatusLabelPipe } from '../../../pipes/status-label-pipe';
 
 type BillFilter = 'all' | BillStatus;
 
 
 @Component({
-  imports: [CurrencyPipe, DatePipe, TitleCasePipe, RouterLink],
+  imports: [CurrencyPipe, DatePipe, TitleCasePipe, RouterLink, StatusBadge, StatusLabelPipe],
   selector: 'app-billing-history',
   styleUrl: './billing-history.css',
   templateUrl: './billing-history.html',

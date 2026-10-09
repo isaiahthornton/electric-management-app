@@ -28,7 +28,7 @@
     </tbody>
   </table>
 
-  <p>Status: <span class="status">{{ b.status | titlecase }}</span></p>
+  <p>Status: <span [appStatusBadge]="b.status">{{ b.status | statusLabel }}</span></p>
 
   @if (b.status === 'paid') {
     <p>Paid on {{ b.paidDate | date: 'MMM d, y' : 'UTC' }}</p>

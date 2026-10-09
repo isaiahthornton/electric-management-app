@@ -49,7 +49,7 @@
     <h2>Your Reports</h2>
     @for (outage of outages(); track outage.id) {
       <div class="outage-card">
-        <p><strong>{{ outage.status | statusLabel }}</strong> · Reported {{ outage.timeReported | date: 'MMM d, y, h:mm a' }}</p>
+        <p><span [appStatusBadge]="outage.status">{{ outage.status | statusLabel }}</span> · Reported {{ outage.timeReported | date: 'MMM d, y, h:mm a' }}</p>
         <p>{{ outage.description }}</p>
         <p class="muted">{{ outage.address }}</p>
         @if (outage.timeResolved) {

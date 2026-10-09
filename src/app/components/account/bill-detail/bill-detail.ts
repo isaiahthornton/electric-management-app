@@ -1,6 +1,8 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { CurrencyPipe, DatePipe, TitleCasePipe } from '@angular/common';
+import { CurrencyPipe, DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { StatusBadge } from '../../../directives/status-badge';
+import { StatusLabelPipe } from '../../../pipes/status-label-pipe';
 
 import { AuthService } from '../../../services/auth-service';
 import { BillService } from '../../../services/bill-service';
@@ -11,7 +13,7 @@ import { Bill } from '../../../interfaces/bill';
  * Shows the line items and lets the customer pay an open bill.
  */
 @Component({
-  imports: [CurrencyPipe, DatePipe, TitleCasePipe, RouterLink],
+  imports: [CurrencyPipe, DatePipe, RouterLink, StatusBadge, StatusLabelPipe],
   selector: 'app-bill-detail',
   styleUrl: './bill-detail.css',
   templateUrl: './bill-detail.html',

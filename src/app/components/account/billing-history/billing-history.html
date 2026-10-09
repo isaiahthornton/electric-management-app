@@ -39,7 +39,7 @@
             <td>{{ bill.kwhUsed }} kWh</td>
             <td>{{ bill.amountDue | currency }}</td>
             <td>{{ bill.dueDate | date: 'MMM d, y' : 'UTC' }}</td>
-            <td><span class="status">{{ bill.status | titlecase }}</span></td>
+            <td><span [appStatusBadge]="bill.status">{{ bill.status | statusLabel }}</span></td>
             <td><a [routerLink]="['/account/billing', bill.id]">View</a></td>
           </tr>
         }

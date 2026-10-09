@@ -1,0 +1,42 @@
+<h1>Outage Queue</h1>
+
+@if (isLoading()) {
+  <p>Loading outages…</p>
+} @else if (errorMessage()) {
+  <p class="error-message">{{ errorMessage() }}</p>
+} @else {
+  <div class="queue">
+    @for (column of columns(); track column.status) {
+      <section class="queue-column">
+        <h2>{{ column.title }} ({{ column.outages.length }})</h2>
+
+        @for (o of column.outages; track o.id) {
+          <div class="outage-card">
+            <p><strong>{{ o.address }}</strong></p>
+            <p>{{ o.description }}</p>
+            <p class="muted">{{ customerName(o.customerId) }} · {{ o.timeReported | date: 'MMM d, h:mm a' }}</p>
+
+            @switch (o.status) {
+              @case ('reported') {
+                <button type="button" (click)="setStatus(o, 'in_progress')" [disabled]="savingId() === o.id">Start work</button>
+                <button type="button" (click)="setStatus(o, 'resolved')" [disabled]="savingId() === o.id">Mark resolved</button>
+              }
+              @case ('in_progress') {
+                <button type="button" (click)="setStatus(o, 'resolved')" [disabled]="savingId() === o.id">Mark resolved</button>
+              }
+              @case ('resolved') {
+                @let hours = hoursToResolve(o);
+                @if (hours !== null) {
+                  <p class="muted">Fixed in {{ hours | number: '1.0-1' }} hrs</p>
+                }
+                <button type="button" (click)="setStatus(o, 'in_progress')" [disabled]="savingId() === o.id">Reopen</button>
+              }
+            }
+          </div>
+        } @empty {
+          <p class="muted">None</p>
+        }
+      </section>
+    }
+  </div>
+}

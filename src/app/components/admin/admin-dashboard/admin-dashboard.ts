@@ -10,13 +10,14 @@ import { Customer } from '../../../interfaces/customer';
 import { Bill } from '../../../interfaces/bill';
 import { Outage } from '../../../interfaces/outage';
 import { StatusLabelPipe } from '../../../pipes/status-label-pipe';
+import { StatusBadge } from '../../../directives/status-badge';
 
 /**
  * Admin dashboard (/admin).
  * Company-wide numbers: customers, money owed, usage billed, and outage response.
  */
 @Component({
-  imports: [CurrencyPipe, DatePipe, DecimalPipe, RouterLink, StatusLabelPipe],
+  imports: [CurrencyPipe, DatePipe, DecimalPipe, RouterLink, StatusLabelPipe, StatusBadge],
   selector: 'app-admin-dashboard',
   styleUrl: './admin-dashboard.css',
   templateUrl: './admin-dashboard.html',

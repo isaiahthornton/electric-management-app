@@ -1,0 +1,53 @@
+<h1>Billing</h1>
+
+@if (isLoading()) {
+  <p>Loading billing data…</p>
+} @else if (errorMessage()) {
+  <p class="error-message">{{ errorMessage() }}</p>
+} @else {
+  <section class="billing-run">
+    <h2>Run Billing</h2>
+    <p class="muted">
+      Creates a bill for each active customer using their readings on the 1st of the month and the
+      1st of the next month, at their current rate plan.
+    </p>
+    <label>
+      Billing month
+      <input type="month" [(ngModel)]="billingMonth" />
+    </label>
+    <button type="button" (click)="runBilling()" [disabled]="isRunning()">
+      {{ isRunning() ? 'Running…' : 'Generate Bills' }}
+    </button>
+
+    @if (runMessage()) {
+      <p>{{ runMessage() }}</p>
+    }
+    @if (skipped().length > 0) {
+      <p class="muted">Skipped:</p>
+      <ul>
+        @for (reason of skipped(); track reason) {
+          <li class="muted">{{ reason }}</li>
+        }
+      </ul>
+    }
+  </section>
+
+  <h2>Billing Periods</h2>
+  <table class="admin-table">
+    <thead>
+      <tr><th>Period</th><th>Bills</th><th>Usage</th><th>Billed</th><th>Collected</th><th>Outstanding</th></tr>
+    </thead>
+    <tbody>
+      @for (p of periodSummaries(); track p.period) {
+        <tr>
+          <td>{{ p.period | date: 'MMMM y' : 'UTC' }}</td>
+          <td>{{ p.billCount }}</td>
+          <td>{{ p.kwh | number }} kWh</td>
+          <td>{{ p.billed | currency }}</td>
+          <td>{{ p.collected | currency }}</td>
+          <td>{{ p.outstanding | currency }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

@@ -21,17 +21,16 @@
   justify-content: center;
   border-bottom: 1px solid #c8ccd2;
 }
-
 .bar {
   width: 60%;
   max-width: 32px;
   min-height: 2px;
-  background: #4a86c8;
+  background: var(--line-blue);
   border-radius: 4px 4px 0 0; /* rounded top, flat on the baseline */
 }
 
 .bar.peak {
-  background: #1f5596;
+  background: var(--grid-navy);
 }
 
 .bar-column:hover .bar {

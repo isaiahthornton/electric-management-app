@@ -1,0 +1,75 @@
+<h1>Rate Plans</h1>
+
+@if (isLoading()) {
+  <p>Loading…</p>
+} @else {
+  @if (errorMessage()) {
+    <p class="error-message">{{ errorMessage() }}</p>
+  }
+  @if (successMessage()) {
+    <p class="success-message">{{ successMessage() }}</p>
+  }
+
+  <section class="plan-form">
+    <h2>{{ editingId() === null ? 'Add a Rate Plan' : 'Edit Rate Plan' }}</h2>
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <label>Name <input formControlName="name" /></label>
+      @if (form.controls.name.touched && form.controls.name.invalid) {
+        <p class="field-error">Name is required (40 characters max).</p>
+      }
+
+      <label>Price per kWh ($) <input type="number" step="0.01" formControlName="pricePerKwh" /></label>
+      @if (form.controls.pricePerKwh.touched && form.controls.pricePerKwh.invalid) {
+        <p class="field-error">Enter a price between $0.01 and $1.00.</p>
+      }
+
+      <label>Monthly fee ($) <input type="number" step="0.01" formControlName="monthlyFee" /></label>
+      @if (form.controls.monthlyFee.touched && form.controls.monthlyFee.invalid) {
+        <p class="field-error">Fee can't be negative.</p>
+      }
+
+      <label>Description <input formControlName="description" /></label>
+      @if (form.controls.description.touched && form.controls.description.invalid) {
+        <p class="field-error">Description is required (120 characters max).</p>
+      }
+
+      <button type="submit" [disabled]="isSaving()">
+        {{ editingId() === null ? 'Add Plan' : 'Save Changes' }}
+      </button>
+      @if (editingId() !== null) {
+        <button type="button" (click)="cancelEdit()">Cancel</button>
+      }
+    </form>
+  </section>
+
+  <table class="admin-table">
+    <thead>
+      <tr><th>Name</th><th>Price/kWh</th><th>Monthly Fee</th><th>Description</th><th>Customers</th><th></th></tr>
+    </thead>
+    <tbody>
+      @for (plan of plans(); track plan.id) {
+        <tr>
+          <td>{{ plan.name }}</td>
+          <td>{{ plan.pricePerKwh | currency }}</td>
+          <td>{{ plan.monthlyFee | currency }}</td>
+          <td>{{ plan.description }}</td>
+          <td>{{ customerCount(plan.id) }}</td>
+          <td>
+            @if (confirmDeleteId() === plan.id) {
+              <button type="button" (click)="deletePlan(plan)">Confirm delete</button>
+              <button type="button" (click)="confirmDeleteId.set(null)">Cancel</button>
+            } @else {
+              <button type="button" (click)="startEdit(plan)">Edit</button>
+              <button
+                type="button"
+                (click)="confirmDeleteId.set(plan.id)"
+                [disabled]="customerCount(plan.id) > 0"
+                [attr.title]="customerCount(plan.id) > 0 ? 'Move customers off this plan before deleting it' : null"
+              >Delete</button>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

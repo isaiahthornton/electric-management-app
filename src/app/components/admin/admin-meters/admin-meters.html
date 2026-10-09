@@ -1,0 +1,74 @@
+<h1>Meters</h1>
+
+@if (isLoading()) {
+  <p>Loading meters…</p>
+} @else {
+  @if (errorMessage()) {
+    <p class="error-message">{{ errorMessage() }}</p>
+  }
+
+  <table class="admin-table">
+    <thead>
+      <tr><th>Meter #</th><th>Customer</th><th>Installed</th><th>Latest Reading</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      @for (meter of meters(); track meter.id) {
+        @let latest = latestReadings().get(meter.id);
+        <tr>
+          <td>{{ meter.meterNumber }}</td>
+          <td>{{ customerName(meter.customerId) }}</td>
+          <td>{{ meter.installationDate | date: 'MMM d, y' : 'UTC' }}</td>
+          <td>
+            @if (latest) {
+              {{ latest.readingValue | number }} kWh on {{ latest.readingDate | date: 'MMM d, y' : 'UTC' }}
+            } @else {
+              No readings
+            }
+          </td>
+          <td>
+            <select
+              [value]="meter.status"
+              (change)="changeStatus(meter, $event)"
+              [disabled]="savingId() === meter.id"
+              [attr.aria-label]="'Status for meter ' + meter.meterNumber"
+            >
+              @for (s of statuses; track s) {
+                <option [value]="s">{{ s | titlecase }}</option>
+              }
+            </select>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  <section class="reading-form">
+    <h2>Enter a Meter Reading</h2>
+    <form [formGroup]="readingForm" (ngSubmit)="addReading()">
+      <label>
+        Meter
+        <select formControlName="meterId">
+          <option [ngValue]="0" disabled>Choose a meter</option>
+          @for (meter of meters(); track meter.id) {
+            <option [ngValue]="meter.id">{{ meter.meterNumber }} · {{ customerName(meter.customerId) }}</option>
+          }
+        </select>
+      </label>
+      @if (readingForm.controls.meterId.touched && readingForm.controls.meterId.invalid) {
+        <p class="field-error">Choose a meter.</p>
+      }
+
+      <label>Reading date <input type="date" formControlName="readingDate" /></label>
+      <label>Reading (kWh on the dial) <input type="number" formControlName="readingValue" /></label>
+
+      <button type="submit">Save Reading</button>
+
+      @if (readingError()) {
+        <p class="error-message">{{ readingError() }}</p>
+      }
+      @if (readingMessage()) {
+        <p class="success-message">{{ readingMessage() }}</p>
+      }
+    </form>
+  </section>
+}

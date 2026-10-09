@@ -52,6 +52,7 @@
             <td>{{ o.address }}</td>
             <td>{{ o.description }}</td>
             <td>{{ o.status | statusLabel }}</td>
+            <td><span [appStatusBadge]="o.status">{{ o.status | statusLabel }}</span></td>
           </tr>
         }
       </tbody>
