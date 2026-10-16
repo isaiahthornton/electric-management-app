@@ -24,6 +24,7 @@ import { calculateMonthlyUsage } from '../../../utils/usage';
   templateUrl: './rate-plan-compare.html',
 })
 export class RatePlanCompare implements OnInit {
+  // Dependency Injection
   private authService = inject(AuthService);
   private customerService = inject(CustomerService);
   private meterService = inject(MeterService);
