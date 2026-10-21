@@ -1,0 +1,6 @@
+@ThorntonEnergy.Api_HostAddress = http://localhost:5067
+
+GET {{ThorntonEnergy.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
