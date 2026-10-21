@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace ThorntonEnergy.Api.Models;
@@ -15,6 +16,9 @@ public class Bill
     public decimal EnergyCharge { get; set; }
     public decimal ServiceCharge { get; set; }
     public DateOnly? PaidDate { get; set; }
+
+    // SQL Server changes this on every update. If two people edit the same bill, the second save fails (409).
+    [Timestamp, JsonIgnore] public byte[] RowVersion { get; set; } = [];
 
     [JsonIgnore] public Customer Customer { get; set; } = null!;
 }

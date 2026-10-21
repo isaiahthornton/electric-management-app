@@ -56,6 +56,12 @@ namespace ThorntonEnergy.Api.Migrations
                     b.Property<DateOnly>("PeriodStart")
                         .HasColumnType("date");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<decimal>("ServiceCharge")
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");

@@ -1,43 +1,24 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using ThorntonEnergy.Api.Auth;
-using ThorntonEnergy.Api.Data;
 using ThorntonEnergy.Api.Dtos;
-using ThorntonEnergy.Api.Models;
+using ThorntonEnergy.Api.Services;
 
 namespace ThorntonEnergy.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class MetersController(AppDbContext db) : AppControllerBase
+public class MetersController(IMeterService meters) : AppControllerBase
 {
     // GET api/meters (admin: all, or ?customerId=) | customer: only their own (newest install first)
     [HttpGet]
-    public async Task<ActionResult<List<Meter>>> GetAll([FromQuery] int? customerId)
-    {
-        if (!TryGetCustomerScope(customerId, out var scope)) return Forbid();
-
-        if (scope is null)
-            return await db.Meters.OrderBy(m => m.Id).ToListAsync();
-
-        return await db.Meters
-            .Where(m => m.CustomerId == scope)
-            .OrderByDescending(m => m.InstallationDate)
-            .ToListAsync();
-    }
+    public async Task<ActionResult<List<MeterDto>>> GetAll([FromQuery] int? customerId) =>
+        FromResult(await meters.GetMetersAsync(customerId));
 
     // PATCH api/meters/1   body: { "status": "inactive" } (admin only)
     [Authorize(Roles = AppRoles.Admin)]
     [HttpPatch("{id:int}")]
-    public async Task<ActionResult<Meter>> Update(int id, MeterPatch patch)
-    {
-        var meter = await db.Meters.FindAsync(id);
-        if (meter is null) return NotFound();
-
-        meter.Status = patch.Status;
-        await db.SaveChangesAsync();
-        return meter;
-    }
+    public async Task<ActionResult<MeterDto>> Update(int id, MeterPatch patch) =>
+        FromResult(await meters.UpdateMeterAsync(id, patch));
 }
