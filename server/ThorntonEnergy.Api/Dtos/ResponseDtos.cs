@@ -20,3 +20,12 @@ public record ContactMessageDto(int Id, string Name, string Email, MessageTopic 
     string Message, DateTime SentAt, MessageStatus Status);
 
 public record RatePlanDto(int Id, string Name, decimal PricePerKwh, decimal MonthlyFee, string Description);
+
+// Admin insight (dashboard numbers and the activity feed)
+public record AdminKpisDto(int ActiveCustomers, decimal UnpaidBalance, decimal OverdueBalance, decimal RevenueThisMonth,
+    int OpenOutages, decimal AvgKwhLastMonth);
+
+public record MonthlyUsageDto(DateOnly Month, long TotalKwh, decimal TotalBilled);
+
+public record AuditLogDto(int Id, string TableName, int RecordId, string ColumnName, string? OldValue, string? NewValue,
+    DateTime ChangedAt, string? ChangedBy);

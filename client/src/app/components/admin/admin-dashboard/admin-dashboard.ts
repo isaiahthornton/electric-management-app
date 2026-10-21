@@ -3,18 +3,17 @@ import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
-import { CustomerService } from '../../../services/customer-service';
-import { BillService } from '../../../services/bill-service';
+import { AdminInsightService } from '../../../services/admin-insight-service';
 import { OutageService } from '../../../services/outage-service';
-import { Customer } from '../../../interfaces/customer';
-import { Bill } from '../../../interfaces/bill';
+import { AdminKpis, UsageTrendPoint } from '../../../interfaces/admin-insight';
 import { Outage } from '../../../interfaces/outage';
 import { StatusLabelPipe } from '../../../pipes/status-label-pipe';
 import { StatusBadge } from '../../../directives/status-badge';
 
 /**
  * Admin dashboard (/admin).
- * Company-wide numbers: customers, money owed, usage billed, and outage response.
+ * Company-wide numbers (KPIs) and the monthly usage chart are calculated by the database
+ * (a SQL view and a stored procedure); the open outages list comes from the outages endpoint.
  */
 @Component({
   imports: [CurrencyPipe, DatePipe, DecimalPipe, RouterLink, StatusLabelPipe, StatusBadge],
@@ -23,37 +22,20 @@ import { StatusBadge } from '../../../directives/status-badge';
   templateUrl: './admin-dashboard.html',
 })
 export class AdminDashboard implements OnInit {
-  private customerService = inject(CustomerService);
-  private billService = inject(BillService);
+  private insightService = inject(AdminInsightService);
   private outageService = inject(OutageService);
 
-  protected readonly customers = signal<Customer[]>([]);
-  protected readonly bills = signal<Bill[]>([]);
+  protected readonly kpis = signal<AdminKpis | null>(null);
+  protected readonly trend = signal<UsageTrendPoint[]>([]);
   protected readonly outages = signal<Outage[]>([]);
   protected readonly isLoading = signal(true);
   protected readonly errorMessage = signal('');
 
-  // --- Customers ---
-  protected readonly activeCustomerCount = computed(
-    () => this.customers().filter((c) => c.status === 'active').length,
-  );
-
-  // --- Billing ---
-  protected readonly openBills = computed(() => this.bills().filter((b) => b.status !== 'paid'));
-  protected readonly outstandingBalance = computed(() =>
-    this.openBills().reduce((total, b) => total + b.amountDue, 0),
-  );
-  protected readonly overdueCount = computed(
-    () => this.openBills().filter((b) => b.status === 'overdue').length,
-  );
-
-  // Bills come back newest first, so bills()[0] is in the latest period
-  protected readonly latestPeriod = computed(() => this.bills()[0]?.periodStart ?? null);
-  protected readonly latestPeriodKwh = computed(() =>
-    this.bills()
-      .filter((b) => b.periodStart === this.latestPeriod())
-      .reduce((total, b) => total + b.kwhUsed, 0),
-  );
+  // --- Chart: each bar is a percentage of the biggest month, so the tallest bar fills the chart ---
+  protected readonly maxKwh = computed(() => Math.max(1, ...this.trend().map((p) => p.totalKwh)));
+  protected barHeight(point: UsageTrendPoint): number {
+    return (point.totalKwh / this.maxKwh()) * 100;
+  }
 
   // --- Outages ---
   protected readonly activeOutages = computed(() => this.outages().filter((o) => o.status !== 'resolved'));
@@ -72,13 +54,13 @@ export class AdminDashboard implements OnInit {
 
   ngOnInit(): void {
     forkJoin({
-      customers: this.customerService.getAllCustomers(),
-      bills: this.billService.getAllBills(),
+      kpis: this.insightService.getKpis(),
+      trend: this.insightService.getUsageTrend(12),
       outages: this.outageService.getAllOutages(),
     }).subscribe({
-      next: ({ customers, bills, outages }) => {
-        this.customers.set(customers);
-        this.bills.set(bills);
+      next: ({ kpis, trend, outages }) => {
+        this.kpis.set(kpis);
+        this.trend.set(trend);
         this.outages.set(outages);
         this.isLoading.set(false);
       },

@@ -97,6 +97,11 @@ export const routes: Routes = [
         loadComponent: () => import('./components/admin/admin-messages/admin-messages').then((m) => m.AdminMessages),
         title: 'Inbox | Thornton Energy Admin',
       },
+      {
+        path: 'activity',
+        loadComponent: () => import('./components/admin/admin-activity/admin-activity').then((m) => m.AdminActivity),
+        title: 'Activity | Thornton Energy Admin',
+      },
     ]
   },
   {

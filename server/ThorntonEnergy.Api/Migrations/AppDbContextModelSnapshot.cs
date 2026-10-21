@@ -22,6 +22,76 @@ namespace ThorntonEnergy.Api.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ThorntonEnergy.Api.Models.AdminKpis", b =>
+                {
+                    b.Property<int>("ActiveCustomers")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("AvgKwhLastMonth")
+                        .HasPrecision(18, 1)
+                        .HasColumnType("decimal(18,1)");
+
+                    b.Property<int>("OpenOutages")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("OverdueBalance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("RevenueThisMonth")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("UnpaidBalance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.ToTable((string)null);
+
+                    b.ToView("vw_AdminKpis", (string)null);
+                });
+
+            modelBuilder.Entity("ThorntonEnergy.Api.Models.AuditLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ChangedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("ColumnName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("NewValue")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("OldValue")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("RecordId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TableName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AuditLogs");
+                });
+
             modelBuilder.Entity("ThorntonEnergy.Api.Models.Bill", b =>
                 {
                     b.Property<int>("Id")
@@ -75,7 +145,12 @@ namespace ThorntonEnergy.Api.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Bills");
+                    b.ToTable("Bills", t =>
+                        {
+                            t.HasTrigger("trg_Bills_Audit");
+                        });
+
+                    b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
                 });
 
             modelBuilder.Entity("ThorntonEnergy.Api.Models.ContactMessage", b =>
@@ -166,7 +241,12 @@ namespace ThorntonEnergy.Api.Migrations
 
                     b.HasIndex("RatePlanId");
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customers", t =>
+                        {
+                            t.HasTrigger("trg_Customers_Audit");
+                        });
+
+                    b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
                 });
 
             modelBuilder.Entity("ThorntonEnergy.Api.Models.Meter", b =>
@@ -260,7 +340,12 @@ namespace ThorntonEnergy.Api.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Outages");
+                    b.ToTable("Outages", t =>
+                        {
+                            t.HasTrigger("trg_Outages_Audit");
+                        });
+
+                    b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
                 });
 
             modelBuilder.Entity("ThorntonEnergy.Api.Models.RatePlan", b =>
