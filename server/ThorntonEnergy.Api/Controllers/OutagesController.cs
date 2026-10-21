@@ -16,6 +16,12 @@ public class OutagesController(IOutageService outages) : AppControllerBase
     public async Task<ActionResult<List<OutageDto>>> GetAll([FromQuery] int? customerId) =>
         FromResult(await outages.GetAllAsync(customerId));
 
+    // GET api/outages/map (admin only): every outage with its customer name and location, for the map
+    [Authorize(Roles = AppRoles.Admin)]
+    [HttpGet("map")]
+    public async Task<ActionResult<List<OutageMapDto>>> GetMap() =>
+        FromResult(await outages.GetMapAsync());
+
     // GET api/outages/5 (403 if it belongs to another customer)
     [HttpGet("{id:int}")]
     public async Task<ActionResult<OutageDto>> GetById(int id) =>

@@ -1,0 +1,17 @@
+<h1>Outage Map</h1>
+
+@if (isLoading()) {
+  <p>Loading…</p>
+} @else if (errorMessage()) {
+  <p class="error-message">{{ errorMessage() }}</p>
+} @else {
+  <p>{{ openCount() }} open outage(s) of {{ outages().length }} on the map. Click a dot for details.</p>
+
+  <ul class="legend">
+    <li><span class="dot reported"></span> Reported</li>
+    <li><span class="dot in-progress"></span> In progress</li>
+    <li><span class="dot resolved"></span> Resolved</li>
+  </ul>
+
+  <app-map-view [markers]="markers()" height="480px" />
+}

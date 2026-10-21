@@ -14,6 +14,7 @@ import { Bill } from '../../../interfaces/bill';
 import { MeterReading } from '../../../interfaces/meter-reading';
 import { Outage } from '../../../interfaces/outage';
 import { calculateMonthlyUsage } from '../../../utils/usage';
+import { MapMarker, MapView } from '../../map-view/map-view';
 
 /**
  * Customer dashboard (/account).
@@ -21,7 +22,7 @@ import { calculateMonthlyUsage } from '../../../utils/usage';
  * the balance, usage trend, and any open outages from that data.
  */
 @Component({
-  imports: [CurrencyPipe, DatePipe, DecimalPipe, RouterLink, StatusLabelPipe],
+  imports: [CurrencyPipe, DatePipe, DecimalPipe, RouterLink, StatusLabelPipe, MapView],
   selector: 'app-account-dashboard',
   styleUrl: './account-dashboard.css',
   templateUrl: './account-dashboard.html',
@@ -78,6 +79,25 @@ export class AccountDashboard implements OnInit {
   // --- Outages ---
   // Anything not resolved gets a banner at the top of the page
   protected readonly activeOutages = computed(() => this.outages().filter((o) => o.status !== 'resolved'));
+
+  // The customer's service location, colored by their current outage status (outages come back newest first).
+  // null when the address has no coordinates, which hides the map.
+  protected readonly locationMarkers = computed<MapMarker[]>(() => {
+    const c = this.customer();
+    if (c?.latitude == null || c.longitude == null) return [];
+
+    // An unresolved outage wins (it matches the banner above); otherwise show the most recent one
+    const latest = this.activeOutages()[0] ?? this.outages()[0];
+    return [
+      {
+        lat: c.latitude,
+        lng: c.longitude,
+        status: latest?.status ?? 'none',
+        title: c.serviceAddress,
+        lines: [latest ? `Latest outage: ${new StatusLabelPipe().transform(latest.status)}` : 'No outages reported'],
+      },
+    ];
+  });
 
   ngOnInit(): void {
     const customerId = this.authService.getCurrentUser()?.customerId;

@@ -50,4 +50,9 @@
       <a routerLink="/account/usage">View usage history</a>
     </div>
   </div>
+
+  @if (locationMarkers().length > 0) {
+    <h2>Your Service Location</h2>
+    <app-map-view [markers]="locationMarkers()" height="240px" />
+  }
 }

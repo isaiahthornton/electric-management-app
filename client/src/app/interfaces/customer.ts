@@ -10,4 +10,6 @@ export interface Customer {
   serviceAddress:string;
   ratePlanId:number;
   status: AccountStatus;
+  latitude: number | null; // service location for the outage map
+  longitude: number | null;
 }
