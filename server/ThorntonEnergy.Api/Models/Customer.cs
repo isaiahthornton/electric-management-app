@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace ThorntonEnergy.Api.Models;
 
 public class Customer
@@ -10,9 +12,10 @@ public class Customer
     public string Email { get; set; } = string.Empty;
     public string ServiceAddress { get; set; } = string.Empty;
     public int RatePlanId { get; set; }
-    public RatePlan RatePlan { get; set; } = null!;
     public AccountStatus Status { get; set; }
-    public List<Meter> Meters { get; set; } = [];
-    public List<Bill> Bills { get; set; } = [];
-    public List<Outage> Outages { get; set; } = [];
+
+    [JsonIgnore] public RatePlan RatePlan { get; set; } = null!;
+    [JsonIgnore] public List<Meter> Meters { get; set; } = [];
+    [JsonIgnore] public List<Bill> Bills { get; set; } = [];
+    [JsonIgnore] public List<Outage> Outages { get; set; } = [];
 }

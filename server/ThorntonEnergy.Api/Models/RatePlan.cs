@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace ThorntonEnergy.Api.Models;
 
 public class RatePlan
@@ -7,5 +9,6 @@ public class RatePlan
     public decimal PricePerKwh { get; set; }
     public decimal MonthlyFee { get; set; }
     public string Description { get; set; } = string.Empty;
-    public List<Customer> Customers { get; set; } = [];
+
+    [JsonIgnore] public List<Customer> Customers { get; set; } = [];
 }
