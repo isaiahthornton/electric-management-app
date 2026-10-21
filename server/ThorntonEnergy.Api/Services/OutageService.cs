@@ -11,6 +11,7 @@ namespace ThorntonEnergy.Api.Services;
 public interface IOutageService
 {
     Task<Result<List<OutageDto>>> GetAllAsync(int? customerId);
+    Task<Result<List<OutageMapDto>>> GetMapAsync();
     Task<Result<OutageDto>> GetByIdAsync(int id);
     Task<Result<OutageDto>> CreateAsync(CreateOutageRequest request);
     Task<Result<OutageDto>> UpdateAsync(int id, OutagePatch patch);
@@ -35,6 +36,26 @@ public class OutageService(
         var list = await query.OrderByDescending(o => o.TimeReported).ToListAsync();
 
         return Result<List<OutageDto>>.Success(mapper.Map<List<OutageDto>>(list));
+    }
+
+    // Admin only (the controller enforces the role). Every outage whose customer has map coordinates, newest first.
+    public async Task<Result<List<OutageMapDto>>> GetMapAsync()
+    {
+        var rows = await outages.Query().AsNoTracking()
+            .Where(o => o.Customer.Latitude != null && o.Customer.Longitude != null) // EF turns this into a SQL JOIN
+            .OrderByDescending(o => o.TimeReported)
+            .Select(o => new
+            {
+                o.Id, o.CustomerId, o.Customer.FirstName, o.Customer.LastName, o.Address, o.Description,
+                o.TimeReported, o.TimeResolved, o.Status, o.Customer.Latitude, o.Customer.Longitude,
+            })
+            .ToListAsync();
+
+        var pins = rows.Select(r => new OutageMapDto(
+            r.Id, r.CustomerId, $"{r.FirstName} {r.LastName}", r.Address, r.Description,
+            r.TimeReported, r.TimeResolved, r.Status, r.Latitude!.Value, r.Longitude!.Value)).ToList();
+
+        return Result<List<OutageMapDto>>.Success(pins);
     }
 
     public async Task<Result<OutageDto>> GetByIdAsync(int id)

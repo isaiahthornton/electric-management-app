@@ -7,7 +7,7 @@ public record BillDto(int Id, int CustomerId, DateOnly PeriodStart, DateOnly Per
     decimal AmountDue, BillStatus Status, decimal EnergyCharge, decimal ServiceCharge, DateOnly? PaidDate);
 
 public record CustomerDto(int Id, string AccountNumber, string FirstName, string LastName, string Phone, string Email,
-    string ServiceAddress, int RatePlanId, AccountStatus Status);
+    string ServiceAddress, int RatePlanId, AccountStatus Status, decimal? Latitude, decimal? Longitude);
 
 public record MeterDto(int Id, int CustomerId, string MeterNumber, DateOnly InstallationDate, MeterStatus Status);
 
@@ -29,3 +29,7 @@ public record MonthlyUsageDto(DateOnly Month, long TotalKwh, decimal TotalBilled
 
 public record AuditLogDto(int Id, string TableName, int RecordId, string ColumnName, string? OldValue, string? NewValue,
     DateTime ChangedAt, string? ChangedBy);
+
+// One pin on the admin outage map: the outage plus where the customer is
+public record OutageMapDto(int OutageId, int CustomerId, string CustomerName, string Address, string Description,
+    DateTime TimeReported, DateTime? TimeResolved, OutageStatus Status, decimal Latitude, decimal Longitude);

@@ -34,6 +34,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<ContactMessage>().Property(m => m.Status).HasConversion<string>().HasMaxLength(20);
         modelBuilder.Entity<User>().Property(u => u.Role).HasConversion<string>().HasMaxLength(20);
 
+        // Map coordinates: 6 decimal places is about 10 cm, plenty for a street address
+        modelBuilder.Entity<Customer>().Property(c => c.Latitude).HasPrecision(9, 6);
+        modelBuilder.Entity<Customer>().Property(c => c.Longitude).HasPrecision(9, 6);
+
         // No duplicates allowed
         modelBuilder.Entity<Customer>().HasIndex(c => c.AccountNumber).IsUnique();
         modelBuilder.Entity<Meter>().HasIndex(m => m.MeterNumber).IsUnique();

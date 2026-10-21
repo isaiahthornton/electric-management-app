@@ -78,6 +78,11 @@ export const routes: Routes = [
         title: 'Outage Queue | Thornton Energy Admin',
       },
       {
+        path: 'outage-map',
+        loadComponent: () => import('./components/admin/admin-outage-map/admin-outage-map').then((m) => m.AdminOutageMap),
+        title: 'Outage Map | Thornton Energy Admin',
+      },
+      {
         path: 'rate-plans',
         loadComponent: () => import('./components/admin/admin-rate-plans/admin-rate-plans').then((m) => m.AdminRatePlans),
         title: 'Rate Plans | Thornton Energy Admin',

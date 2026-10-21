@@ -2,6 +2,7 @@ import { Service, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Outage, OutageStatus } from '../interfaces/outage';
+import { OutageMapItem } from '../interfaces/outage-map';
 import { API_URL } from '../utils/api';
 import { nowIso } from '../utils/dates';
 
@@ -21,6 +22,10 @@ export class OutageService {
   }
   getAllOutages(): Observable<Outage[]> {
   return this.http.get<Outage[]>(`${this.url}?_sort=timeReported&_order=desc`);
+  }
+  // Admin only: every outage with its customer name and location
+  getOutageMap(): Observable<OutageMapItem[]> {
+    return this.http.get<OutageMapItem[]>(`${this.url}/map`);
   }
   // Resolving stamps the time; moving back out of 'resolved' clears it,
   // so status and timeResolved never disagree

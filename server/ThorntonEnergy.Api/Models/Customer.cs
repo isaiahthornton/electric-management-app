@@ -13,6 +13,8 @@ public class Customer
     public string ServiceAddress { get; set; } = string.Empty;
     public int RatePlanId { get; set; }
     public AccountStatus Status { get; set; }
+    public decimal? Latitude { get; set; }   // service location, used by the outage map (null = not mapped yet)
+    public decimal? Longitude { get; set; }
 
     [JsonIgnore] public RatePlan RatePlan { get; set; } = null!;
     [JsonIgnore] public List<Meter> Meters { get; set; } = [];
