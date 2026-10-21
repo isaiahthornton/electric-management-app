@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ThorntonEnergy.Api.Auth;
 using ThorntonEnergy.Api.Data;
 using ThorntonEnergy.Api.Dtos;
 using ThorntonEnergy.Api.Models;
@@ -8,19 +10,23 @@ namespace ThorntonEnergy.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CustomersController(AppDbContext db) : ControllerBase
+[Authorize]
+public class CustomersController(AppDbContext db) : AppControllerBase
 {
-    // GET api/customers   (sorted by last name)
+    // GET api/customers (admin only, sorted by last name)
+    [Authorize(Roles = AppRoles.Admin)]
     [HttpGet]
     public async Task<ActionResult<List<Customer>>> GetAll()
     {
         return await db.Customers.OrderBy(c => c.LastName).ToListAsync();
     }
 
-    // GET api/customers/1
+    // GET api/customers/1 (customers: only their own record)
     [HttpGet("{id:int}")]
     public async Task<ActionResult<Customer>> GetById(int id)
     {
+        if (!CanAccessCustomer(id)) return Forbid();
+
         var customer = await db.Customers.FindAsync(id);
         if (customer is null) return NotFound();
         return customer;
@@ -30,6 +36,11 @@ public class CustomersController(AppDbContext db) : ControllerBase
     [HttpPatch("{id:int}")]
     public async Task<ActionResult<Customer>> Update(int id, CustomerPatch patch)
     {
+        if (!CanAccessCustomer(id)) return Forbid();
+
+        // Customers can switch their own rate plan, but only an admin can change an account's status
+        if (!IsAdmin && patch.Status is not null) return Forbid();
+
         var customer = await db.Customers.FindAsync(id);
         if (customer is null) return NotFound();
 

@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ThorntonEnergy.Api.Auth;
 using ThorntonEnergy.Api.Data;
 using ThorntonEnergy.Api.Models;
 
@@ -7,9 +9,11 @@ namespace ThorntonEnergy.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = AppRoles.Admin)] // managing plans is admin-only...
 public class RatePlansController(AppDbContext db) : ControllerBase
 {
-    // GET api/ratePlans
+    // GET api/ratePlans (...but anyone can view them: the landing page shows the plans)
+    [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<List<RatePlan>>> GetAll()
     {
@@ -35,7 +39,7 @@ public class RatePlansController(AppDbContext db) : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = plan.Id }, plan);
     }
 
-    // PUT api/ratePlans/1   (replaces every field)
+    // PUT api/ratePlans/1 (replaces every field)
     [HttpPut("{id:int}")]
     public async Task<ActionResult<RatePlan>> Replace(int id, RatePlan input)
     {
@@ -54,7 +58,7 @@ public class RatePlansController(AppDbContext db) : ControllerBase
         return plan;
     }
 
-    // DELETE api/ratePlans/1   (blocked while customers are on the plan)
+    // DELETE api/ratePlans/1 (blocked while customers are on the plan)
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {

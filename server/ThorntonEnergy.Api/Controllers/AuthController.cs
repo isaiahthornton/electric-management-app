@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using ThorntonEnergy.Api.Auth;
 using ThorntonEnergy.Api.Data;
@@ -15,6 +16,7 @@ public class AuthController(AppDbContext db, ITokenService tokens) : ControllerB
 {
     // POST api/auth/login: check the password, then hand back a signed JWT
     [AllowAnonymous]
+    [EnableRateLimiting(RateLimitPolicies.PublicForms)] // slows down password guessing
     [HttpPost("login")]
     public async Task<ActionResult<AuthResponse>> Login(LoginRequest request)
     {
@@ -34,6 +36,7 @@ public class AuthController(AppDbContext db, ITokenService tokens) : ControllerB
 
     // POST api/auth/register: link a new login to an existing customer, then sign them in
     [AllowAnonymous]
+    [EnableRateLimiting(RateLimitPolicies.PublicForms)]
     [HttpPost("register")]
     public async Task<ActionResult<AuthResponse>> Register(RegisterRequest request)
     {
