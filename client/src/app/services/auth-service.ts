@@ -1,24 +1,28 @@
 import { Service, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, map, of, switchMap } from 'rxjs';
-import { SessionUser, User } from '../interfaces/user';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { BehaviorSubject, Observable, catchError, map, of, switchMap, throwError } from 'rxjs';
+import { SessionUser } from '../interfaces/user';
 import { API_URL } from '../utils/api';
 import { Customer } from '../interfaces/customer';
 
 @Service()
 export class AuthService {
   private http = inject(HttpClient);
-  private url = `${API_URL}/users`;
+  private url = `${API_URL}/auth`;
 
   // The "lobby screen": whoever is logged in right now (never includes the password)
   private currentUserSubject = new BehaviorSubject<SessionUser | null>(this.loadFromSession());
   readonly currentUser$ = this.currentUserSubject.asObservable();
 
+  // The API checks the password against its BCrypt hash and never sends the hash back
   login(email: string, password: string): Observable<SessionUser | null> {
-    return this.http.get<User[]>(`${this.url}?email=${email}&password=${password}`).pipe(
-      switchMap((users) => {
-        const user = users[0];
-        if (!user) return of(null); // wrong email or password
+    return this.http.post<SessionUser>(`${this.url}/login`, { email, password }).pipe(
+      // 401 means wrong email or password; anything else is a real error
+      catchError((err: HttpErrorResponse) =>
+        err.status === 401 ? of(null) : throwError(() => err),
+      ),
+      switchMap((user) => {
+        if (!user) return of(null);
 
         // Admins don't have a customer account to check
         if (user.role !== 'customer' || user.customerId == null) return of(user);
@@ -39,30 +43,15 @@ export class AuthService {
     );
   }
 
+  // The API matches the customer, blocks duplicates, and hashes the password
   register(accountNumber: string, email: string, password: string): Observable<SessionUser> {
     return this.http
-      .get<Customer[]>(`${API_URL}/customers?accountNumber=${accountNumber}&email=${email}`)
+      .post<SessionUser>(`${this.url}/register`, { accountNumber, email, password })
       .pipe(
-        switchMap((customers) => {
-          const customer = customers[0];
-          if (!customer) {
-            throw new Error('Customer not found with provided account number and email.');
-          }
-          return this.http.get<User[]>(`${this.url}?customerId=${customer.id}`).pipe(
-            switchMap((existing) => {
-              if (existing.length > 0) {
-                throw new Error('A user account already exists for this customer.');
-              }
-              const newUser: Omit<User, 'id'> = {
-                email,
-                password,
-                role: 'customer',
-                customerId: customer.id,
-              };
-              return this.http.post<User>(this.url, newUser);
-            }),
-          );
-        }),
+        // 404 (no matching customer) and 409 (account already exists) come back as { message }
+        catchError((err: HttpErrorResponse) =>
+          throwError(() => (err.error?.message ? new Error(err.error.message) : err)),
+        ),
         map((user) => this.startSession(user)),
       );
   }
@@ -85,11 +74,10 @@ export class AuthService {
     return saved ? JSON.parse(saved) : null;
   }
 
-  // Strip the password before it goes into sessionStorage, where any script on the page can read it
-  private startSession(user: User): SessionUser {
-    const { password: _password, ...safeUser } = user;
-    sessionStorage.setItem('currentUser', JSON.stringify(safeUser));
-    this.currentUserSubject.next(safeUser);
-    return safeUser;
+  // The API already left out the password, so the user can be stored as-is
+  private startSession(user: SessionUser): SessionUser {
+    sessionStorage.setItem('currentUser', JSON.stringify(user));
+    this.currentUserSubject.next(user);
+    return user;
   }
 }
