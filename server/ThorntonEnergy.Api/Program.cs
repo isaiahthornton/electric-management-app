@@ -131,9 +131,11 @@ builder.Services.AddOpenApi(options => options.AddDocumentTransformer<BearerSecu
 
 var app = builder.Build();
 
-// Fill an empty database with the v1 demo data (skipped once users exist)
-using (var scope = app.Services.CreateScope())
+// Fill an empty database with the v1 demo data (skipped once users exist).
+// Not in the "Testing" environment: the seeder uses SQL Server IDENTITY_INSERT, and tests seed their own tiny dataset.
+if (!app.Environment.IsEnvironment("Testing"))
 {
+    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await DbSeeder.SeedAsync(db, app.Environment.ContentRootPath);
 }
@@ -161,3 +163,6 @@ app.UseRateLimiter();    // 3. Too many attempts? (only endpoints with [EnableRa
 app.MapControllers();
 
 app.Run();
+
+// Lets the test project start the whole app in memory (WebApplicationFactory<Program>)
+public partial class Program;

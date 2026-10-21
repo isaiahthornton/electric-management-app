@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Coverage settings picked up by dotnet test when it collects XPlat Code Coverage.
+     Generated code (EF migrations) and the one-off SQL Server seeder are left out, so the number
+     reflects the code we wrote and test. -->
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <ExcludeByFile>**/Migrations/**/*.cs</ExcludeByFile>
+          <Exclude>[ThorntonEnergy.Api]ThorntonEnergy.Api.Data.DbSeeder*</Exclude>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>
