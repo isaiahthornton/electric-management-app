@@ -13,10 +13,10 @@ export class MeterService {
 
 
   getMetersByCustomer(customerId: number): Observable<Meter[]> {
-    return this.http.get<Meter[]>(`${this.metersUrl}?customerId=${customerId}&_sort=installationDate&_order=desc`);
+    return this.http.get<Meter[]>(`${this.metersUrl}?customerId=${customerId}`);
   }
   getReadingsByMeter(meterId: number): Observable<MeterReading[]> {
-    return this.http.get<MeterReading[]>(`${this.readingsUrl}?meterId=${meterId}&_sort=readingDate&_order=asc`);
+    return this.http.get<MeterReading[]>(`${this.readingsUrl}?meterId=${meterId}`);
   }
   getReadingsByCustomer(customerId: number): Observable<MeterReading[]> {
     return this.getMetersByCustomer(customerId).pipe(
@@ -27,7 +27,7 @@ export class MeterService {
     return this.http.get<Meter[]>(this.metersUrl);
   }
   getAllReadings(): Observable<MeterReading[]> {
-    return this.http.get<MeterReading[]>(`${this.readingsUrl}?_sort=readingDate&_order=asc`);
+    return this.http.get<MeterReading[]>(`${this.readingsUrl}`);
   }
   updateMeterStatus(meterId: number, status: MeterStatus): Observable<Meter> {
     return this.http.patch<Meter>(`${this.metersUrl}/${meterId}`, { status });

@@ -51,7 +51,7 @@ export function buildBill(
 }
 
 // An unpaid bill whose due date has passed is overdue. Applied when bills load,
-// so "overdue" is always current instead of depending on what's saved in db.json.
+// so "overdue" is always current instead of depending on what is stored (the API also calculates it).
 export function withOverdueStatus(bill: Bill, today: string = todayIso()): Bill {
   return bill.status === 'unpaid' && bill.dueDate < today ? { ...bill, status: 'overdue' } : bill;
 }

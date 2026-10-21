@@ -47,7 +47,7 @@ export class BillDetail implements OnInit {
         this.isLoading.set(false);
       },
       error: () => {
-        // json-server returns a 404 for an id that doesn't exist
+        // the API returns 404 for an id that does not exist (and 403 for another customer's bill)
         this.errorMessage.set('Bill not found.');
         this.isLoading.set(false);
       },

@@ -36,3 +36,21 @@ view built from scalar subqueries; a procedure that groups `Bills` by the first 
   `usage-trend?months=0` returns 400.
 
 **Human review:** Pending. Isaiah to read each SQL object in `Migrations/*_AdminInsight.cs` and be able to explain it.
+
+## 2. Release documentation (README, architecture map, BRD, demo script)
+
+**Prompt (summary):** Write the v2.0 README (live links, demo logins, architecture diagram, tech stack, security model,
+setup, testing, deployment, skills demonstrated), a file-by-file architecture document with the request flow and a data
+model diagram, a business requirements document, and a five-minute client demo script.
+
+**Output summary:** Four Markdown documents with Mermaid diagrams, written from the code as it stands at v2.0.
+
+**What was checked or changed:**
+- Facts were taken from the repository (endpoint list, file names, settings) rather than from memory.
+- The demo script was checked against the live data: Jane has one unpaid bill and Robert Chen's outage is in the
+  "reported" state, as the script says.
+- Anything the demo changes permanently (paying a bill) is called out in `docs/DEMO.md`.
+- The BRD is a draft written after the system was built. It describes what v2.0 does; it is not a record of requirements
+  gathered from the client.
+
+**Human review:** Pending. Isaiah to read the documents and correct anything he would not say himself.

@@ -6,7 +6,7 @@ export function todayIso(): string {
   const day = String(now.getDate()).padStart(2, '0');
   return `${now.getFullYear()}-${month}-${day}`;
 }
-// Current local date + time as 'YYYY-MM-DDTHH:mm:ss' (same format as timeReported in db.json)
+// Current local date + time as 'YYYY-MM-DDTHH:mm:ss' (same format the API uses for timeReported)
 export function nowIso(): string {
   const now = new Date();
   const time = [now.getHours(), now.getMinutes(), now.getSeconds()]

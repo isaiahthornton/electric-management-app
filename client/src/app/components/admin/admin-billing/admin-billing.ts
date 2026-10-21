@@ -160,7 +160,7 @@ export class AdminBilling implements OnInit {
       },
       error: (err) => {
         console.error('Billing run failed:', err);
-        this.runMessage.set('The billing run failed partway. Check db.json before running again.');
+        this.runMessage.set('The billing run failed partway. Check the Billing page for bills that were already created before running again.');
         this.isRunning.set(false);
       },
     });
