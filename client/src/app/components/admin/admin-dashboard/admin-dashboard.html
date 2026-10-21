@@ -1,0 +1,88 @@
+<h1>Admin Dashboard</h1>
+
+@if (isLoading()) {
+  <p>Loading…</p>
+} @else if (errorMessage()) {
+  <p class="error-message">{{ errorMessage() }}</p>
+} @else {
+  @if (kpis(); as k) {
+    <div class="stat-grid">
+      <div class="stat-card">
+        <h2>Active Customers</h2>
+        <p class="stat-value">{{ k.activeCustomers }}</p>
+        <a routerLink="/admin/customers">Manage customers</a>
+      </div>
+
+      <div class="stat-card">
+        <h2>Unpaid Balance</h2>
+        <p class="stat-value">{{ k.unpaidBalance | currency }}</p>
+        <a routerLink="/admin/billing">Open billing</a>
+      </div>
+
+      <div class="stat-card">
+        <h2>Overdue Balance</h2>
+        <p class="stat-value">{{ k.overdueBalance | currency }}</p>
+        <p>Unpaid and past the due date</p>
+      </div>
+
+      <div class="stat-card">
+        <h2>Revenue This Month</h2>
+        <p class="stat-value">{{ k.revenueThisMonth | currency }}</p>
+        <p>Bills paid so far</p>
+      </div>
+
+      <div class="stat-card">
+        <h2>Open Outages</h2>
+        <p class="stat-value">{{ k.openOutages }}</p>
+        @if (avgResolutionHours(); as hours) {
+          <p>Avg. repair time: {{ hours | number: '1.0-1' }} hrs</p>
+        }
+        <a routerLink="/admin/outages">Open outage queue</a>
+      </div>
+
+      <div class="stat-card">
+        <h2>Avg. Usage Last Month</h2>
+        <p class="stat-value">{{ k.avgKwhLastMonth | number: '1.0-0' }} kWh</p>
+        <p>Per bill</p>
+      </div>
+    </div>
+  }
+
+  <h2>Monthly Usage and Billing</h2>
+  @if (trend().length === 0) {
+    <p>No billing data yet.</p>
+  } @else {
+    <div class="usage-chart" role="img" aria-label="Bar chart of kWh billed per month">
+      @for (p of trend(); track p.month) {
+        <div class="usage-bar-column">
+          <span class="usage-bar-value">{{ p.totalKwh | number }}</span>
+          <div class="usage-bar" [style.height.%]="barHeight(p)"></div>
+          <span class="usage-bar-label">{{ p.month | date: 'MMM yy' : 'UTC' }}</span>
+          <span class="usage-bar-money">{{ p.totalBilled | currency: 'USD' : 'symbol' : '1.0-0' }}</span>
+        </div>
+      }
+    </div>
+    <p class="chart-note">Bar height = kWh billed that month. Dollar amount = total billed.</p>
+  }
+
+  <h2>Open Outages</h2>
+  @if (activeOutages().length === 0) {
+    <p>No active outages.</p>
+  } @else {
+    <table class="admin-table">
+      <thead>
+        <tr><th>Reported</th><th>Address</th><th>Description</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        @for (o of activeOutages(); track o.id) {
+          <tr>
+            <td>{{ o.timeReported | date: 'MMM d, h:mm a' }}</td>
+            <td>{{ o.address }}</td>
+            <td>{{ o.description }}</td>
+            <td><span [appStatusBadge]="o.status">{{ o.status | statusLabel }}</span></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+}

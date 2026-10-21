@@ -1,0 +1,18 @@
+@ThorntonEnergy.Api_HostAddress = https://localhost:7159
+
+### Rate plans
+GET {{ThorntonEnergy.Api_HostAddress}}/api/ratePlans
+Accept: application/json
+
+### Jane's bills (newest first)
+GET {{ThorntonEnergy.Api_HostAddress}}/api/bills?customerId=1
+Accept: application/json
+
+### Log in
+POST {{ThorntonEnergy.Api_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "jane@example.com",
+  "password": "jane123"
+}

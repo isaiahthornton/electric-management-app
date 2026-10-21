@@ -1,208 +1,160 @@
-# Thornton Energy: Electric Management App
+# Thornton Energy: Electric Management App (v2.0)
 
-A customer portal and operations back office for **Thornton Energy Inc.**, a fictional electric utility serving central New Jersey. Customers pay bills, track usage, compare rate plans, and report outages. Admins manage accounts, meters, rate plans, billing runs, and the outage repair queue.
+A customer portal and operations back office for **Thornton Energy Inc.**, a fictional electric utility serving central New Jersey. Customers view and pay bills, track usage, compare rate plans and report outages. Admins manage accounts, meters, rate plans, billing and the outage queue, and get a live KPI dashboard, an audit trail and an outage map.
 
-Built with **Angular 22** as Revature Project 1. The app talks to a mock REST API (json-server) through `HttpClient`, so it can be pointed at a real backend by changing one URL.
+Built as a client demo. v1 was an Angular app on a mock REST API. **v2 is a real three-tier application running on Azure.**
 
----
+## Live demo
 
-## Features
-
-### Customer portal (`/account`)
-
-| Page | What it does |
+| | URL |
 |---|---|
-| **Dashboard** | Balance due and next due date, this month's usage vs. last month, banners for active outages |
-| **Usage** | 12-month bar chart of kWh calculated from meter readings, with total, average, and peak month |
-| **Billing** | Bill history filterable by status; each bill opens a detail page with line items and **Pay Now** |
-| **Outages** | Report an outage (address pre-filled) and follow the status of past reports |
-| **Rate Plans** | Estimates what every plan would cost *this* customer from their real average usage, and switches plans in one click |
+| Web app | https://thornton-energy-web-drg8hqcqeudndtf9.centralus-01.azurewebsites.net |
+| API (base) | https://thornton-energy-api-f2hcgjatdwfzdje5.centralus-01.azurewebsites.net/api |
 
-### Admin portal (`/admin`)
+The database is on Azure SQL's free tier, which **pauses itself when idle**. The first request after a quiet period can take 30 seconds or more while it wakes up.
 
-| Page | What it does |
-|---|---|
-| **Dashboard** | Customer count, outstanding balance, kWh billed in the latest period, active outages, average repair time |
-| **Customers** | Search by name, account number, email, or address; filter and change account status |
-| **Billing** | Month-by-month totals, plus a **billing run** that generates bills from meter readings and each customer's rate plan |
-| **Meters** | Latest reading per meter, meter status, and reading entry (readings must be later and higher than the last one) |
-| **Rate Plans** | Create, edit, and delete plans; plans with customers on them can't be deleted |
-| **Outages** | Repair queue in three columns: Reported → In Progress → Resolved, with time-to-fix |
-| **Inbox** | Messages sent from the public Contact page, with unread tracking |
-
-### Public site
-
-Landing page, About (company history, service area, leadership), Contact (message form and FAQ), Login, Register for online access, and a 404 page.
-
----
-
-## Getting started
-
-### Prerequisites
-
-- **Node.js 22.22.3+ or 24.15+** (Angular 22's minimum; check with `node -v`)
-- npm (comes with Node)
-
-### Install and run
-
-```bash
-npm install
-
-# Terminal 1: the mock API on http://localhost:3000
-npm run api
-
-# Terminal 2: the Angular app on http://localhost:4200
-npm start
-```
-
-Both must be running. The app shows "Could not load…" messages if the API isn't up.
-
-### Reset the demo data
-
-Payments, registrations, outages, and messages are saved to `db.json` as you use the app. To restore the original demo state:
-
-```bash
-npm run reset-db
-```
-
-This copies `db.seed.json` over `db.json`. The API picks up the change automatically. Log out and back in afterward if you were signed in.
-
-### Run the tests
-
-```bash
-npm test -- --watch=false
-```
-
-Unit tests use Vitest. They cover the auth guard (logged out, wrong role, right role), login (password never stored, suspended accounts blocked), bill payment and overdue detection, billing math, usage calculation, the password-match validator, the status pipe and directive, and that every page component can be created. The API does not need to be running.
-
----
-
-## Demo accounts
+### Demo logins
 
 | Role | Email | Password | Good for showing |
 |---|---|---|---|
 | Admin | `support@thornenergy.com` | `admin123` | Every admin page |
-| Customer | `jane@example.com` | `jane123` | Unpaid bill, active outage banner, 12 months of usage |
-| Customer | `john@example.com` | `john123` | An **overdue** bill, Time-of-Use plan |
-| Customer | `maria@example.com` | `maria123` | Fully paid account on the Green Energy plan |
-| *Unregistered* | Robert Chen | n/a | **Register live** at `/register` with account `TE-100004` and `robert@example.com` |
+| Customer | `jane@example.com` | `jane123` | Unpaid bill, active outage, usage history |
+| Customer | `john@example.com` | `john123` | Time-of-Use plan |
+| Customer | `maria@example.com` | `maria123` | Fully paid account, Green Energy plan |
 
-> Passwords are stored in plain text in `db.json` because this is a mock. See [Limitations](#limitations).
+These are demo accounts with demo data only.
 
-### Suggested walkthrough
+## Architecture
 
-1. **Landing → Register** as Robert to show online-access signup.
-2. **Robert's dashboard**: balance, usage, and his open outage.
-3. Log in as **Jane** → **Rate Plans**: she would save about $26/month on Time-of-Use.
-4. **Billing** → open September → **Pay Now**. The dashboard balance drops to $0.
-5. **Contact** → send a message.
-6. Log in as **Admin** → **Inbox** shows the message; **Outages** → resolve Jane's outage, and her banner disappears.
-7. **Meters** → enter a Nov 1, 2026 reading for one or more meters → **Billing** → run October 2026. Customers with both readings get a new bill; the rest are listed as skipped, with the reason.
-8. `npm run reset-db` before the next demo.
-
----
-
-## How it works
-
-```
-index.html + main.ts ── bootstrapApplication(App, appConfig)
-        │                 (provideRouter + provideHttpClient)
-        ▼
-App shell ── Navbar · <router-outlet /> · Footer
-        ▼
-Router (app.routes.ts) + authGuard ── checks login and role, lazy-loads the page
-        ▼
-Page component ── inject() services, subscribe(), store results in signals,
-        │          computed() derives balances, usage, and estimates
-        ▼
-Services ── one per collection, return Observables from HttpClient
-        ▼
-json-server :3000 ── reads and writes db.json
+```mermaid
+flowchart LR
+    Browser["Browser<br/>Angular 22 SPA"] -- "HTTPS + JWT" --> API["ASP.NET Core Web API<br/>.NET 10, controllers + services"]
+    API -- "EF Core" --> DB[("Azure SQL Database<br/>tables, triggers, view, procedure")]
+    Browser -- "map tiles" --> OSM["OpenStreetMap"]
+    subgraph Azure ["Azure (free tiers)"]
+        Web["App Service F1: static Angular build"]
+        API
+        DB
+    end
+    Web -. "serves" .-> Browser
 ```
 
-- **Components never call the API directly.** Every HTTP call lives in a service in `services/`, and every URL is built from `API_URL` in `utils/api.ts`. Replacing json-server with a real backend (for example ASP.NET Core) means changing that one constant.
-- **Login state** lives in `AuthService` as a `BehaviorSubject`, persisted to `sessionStorage`. The navbar watches it with `toSignal`, and the guard reads it before every protected route.
-- **One guard protects both portals.** Each route declares `data: { role: 'customer' | 'admin' }`, and `authGuard` redirects logged-out users to `/login?returnUrl=…` and wrong-role users to their own portal.
+Inside the API, a request flows through layers, each with one job:
 
-### Data model (`db.json`)
+`middleware -> authentication -> authorization -> controller -> service -> repository -> DbContext -> SQL`
 
-| Collection | Links to | Notes |
-|---|---|---|
-| `users` | `customers` via `customerId` | `null` for admins |
-| `customers` | `ratePlans` via `ratePlanId` | Account number, address, status |
-| `meters` | `customers` via `customerId` | |
-| `meterReadings` | `meters` via `meterId` | Running totals; monthly usage = this reading − last reading |
-| `bills` | `customers` via `customerId` | Stores its own charges so past bills don't change with rate plans |
-| `outages` | `customers` via `customerId` | `timeResolved` is set and cleared together with `status` |
-| `ratePlans` | n/a | Price per kWh and monthly fee |
-| `messages` | n/a | From the Contact page |
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for a file-by-file map and the data model.
 
----
+## Tech stack
 
-## Project structure
+| Layer | Technology |
+|---|---|
+| Front end | Angular 22 (standalone components, signals, reactive forms, `HttpClient` + interceptor), Leaflet maps, Vitest |
+| API | ASP.NET Core Web API on .NET 10, controllers, services, generic repository, DTOs, AutoMapper |
+| Data | Entity Framework Core 10 (code first, migrations), Azure SQL Database, SQL triggers, view and stored procedure |
+| Security | JWT bearer tokens (HS256), BCrypt password hashes, role and ownership checks, rate limiting, CORS allow-list |
+| Tests | xUnit, Moq, `WebApplicationFactory` with SQLite for integration tests, coverlet |
+| Hosting | Azure App Service (Windows, Free F1) for the API and the static front end |
 
+## Features
+
+**Customer portal (`/account`)**
+
+- Dashboard: balance due, this month's usage, active outage banner, map of the service location
+- Usage history chart from meter readings
+- Billing history with bill detail and **Pay Now**
+- Report an outage and follow its status
+- Rate plan comparison with an estimate for this customer's real usage, and one-click plan switch
+
+**Admin portal (`/admin`)**
+
+- Dashboard with six KPI cards and a monthly usage and billing bar chart (calculated in the database)
+- Customers: search, filter, change account status
+- Billing: monthly totals and a billing run (prices come from the customer's rate plan)
+- Meters and readings (readings must be later and not lower than the previous one)
+- Rate plans: create, edit, delete (blocked while customers are on the plan)
+- Outage queue and **outage map** (red = reported, amber = in progress, green = resolved)
+- **Activity**: an audit trail of status and rate-plan changes, written by SQL triggers (what changed, old to new, who)
+- Inbox for contact-form messages
+
+## Security model
+
+- **Authentication:** `POST /api/auth/login` checks a BCrypt password hash and returns a signed JWT (HS256, 60 minutes) with the claims `sub`, `email`, `role` and `customerId`. The API validates signature, issuer, audience and expiry on every request. Suspended or closed accounts cannot sign in, and the server enforces that.
+- **Secure by default:** every endpoint requires a signed-in user unless it says `[AllowAnonymous]`. The only public endpoints are login, register, `GET /api/ratePlans` and `POST /api/messages` (the contact form).
+- **Roles:** admin-only endpoints use `[Authorize(Roles = "Admin")]`, so a customer gets **403**.
+- **Ownership:** customers can only read or change their own bills, meters, readings and outages. The rule lives in one place (`CurrentUser`) and is used by the services, so a customer asking for someone else's data gets **403** even if they guess the id.
+- **Server-side rules:** the browser is never trusted for money or time. Bills are priced from the rate plan, payment dates and outage timestamps are set by the server, and "overdue" is calculated rather than stored.
+- **Rate limiting:** login, register and the contact form allow 10 requests per minute per IP (then 429).
+- **Validation:** request DTOs use Data Annotations; bad input returns 400.
+- **Errors:** unhandled exceptions become a clean JSON problem response with a correlation id (`X-Correlation-ID`); stack traces appear only in Development.
+- **Secrets:** never in git. Locally they live in .NET user secrets; in Azure they are App Service settings (`Jwt__Key`, the connection string).
+- **Why JWT in a header and not a cookie:** the front end and the API are different sites (two subdomains of `azurewebsites.net`, which is on the public suffix list), so cookies would be third-party cookies that browsers increasingly block. A bearer token sent by the Angular interceptor works across both sites and is not exposed to cross-site request forgery. The trade-off is that the token is kept in `sessionStorage` (cleared when the tab closes), so we rely on Angular's output escaping and the short token lifetime.
+
+## Run it locally
+
+**Prerequisites:** .NET 10 SDK, Node.js and npm, access to a SQL Server (Azure SQL or LocalDB), `dotnet-ef`.
+
+1. **Secrets** (once), from `server/ThorntonEnergy.Api`:
+   ```powershell
+   dotnet user-secrets set "ConnectionStrings:DefaultConnection" "<your SQL Server connection string>"
+   dotnet user-secrets set "Jwt:Key" "<a random string of 32 or more characters>"
+   ```
+2. **Database:** `dotnet ef database update` creates the tables, triggers, view and procedure. The first start of the API fills an empty database with demo data.
+3. **API:** `dotnet run --launch-profile https` serves https://localhost:7159 (Swagger UI at `/swagger` in Development).
+4. **Front end:** from `client`, `npm install` then `npm start` serves http://localhost:4200 (it calls the local API).
+
+## Testing
+
+```powershell
+# Server: unit tests + integration tests (in-memory SQLite), with coverage
+cd server
+dotnet test --collect:"XPlat Code Coverage"
+
+# Front end: unit tests, with coverage
+cd client
+npx ng test --watch=false --coverage
 ```
-src/app/
-├── components/
-│   ├── account/      Customer portal: layout, dashboard, usage, billing, bill detail, outages, rate plans
-│   ├── admin/        Admin portal: layout, dashboard, customers, billing, meters, rate plans, outages, inbox
-│   └── ...           Public pages: landing, about, contact, login, register, navbar, footer, not-found
-├── directives/       StatusBadge: colors a badge by its status
-├── guards/           authGuard: login + role check with returnUrl
-├── interfaces/       Data shapes: Customer, Bill, Meter, Outage, RatePlan, User, Message, …
-├── pipes/            StatusLabelPipe: 'in_progress' → 'In Progress'
-├── services/         One per collection: Auth, Customer, Bill, Meter, Outage, RatePlan, Message
-└── utils/            api.ts, billing.ts, usage.ts, dates.ts, validators.ts
+
+- **Unit tests** cover the billing rules, token creation, ownership rules, and the bill and meter services (pay once, ownership, overdue, reading order).
+- **Integration tests** start the whole API in memory and check the security rules over HTTP: 401 without a token, 403 for a customer on an admin endpoint or another customer's bill, wrong password, successful login, and full workflows.
+- The admin KPI view, the usage procedure and the audit session interceptor only exist in SQL Server, so SQLite tests cover only who may call those endpoints.
+
+## Deployment
+
+Both apps run in the resource group `rg-thornton-energy` (Central US) on one free App Service plan. Add any new app setting in Azure **before** deploying code that needs it (the API refuses to start without `Jwt__Key`).
+
+```powershell
+# API (from server\ThorntonEnergy.Api)
+dotnet publish -c Release -o "$env:TEMP\thornton-api"
+Compress-Archive -Path "$env:TEMP\thornton-api\*" -DestinationPath "$env:TEMP\thornton-api.zip" -Force
+az webapp deploy --resource-group rg-thornton-energy --name thornton-energy-api --src-path "$env:TEMP\thornton-api.zip" --type zip
+
+# Front end (from client)
+npx ng build
+Compress-Archive -Path "dist\Electric-Management-App\browser\*" -DestinationPath "$env:TEMP\thornton-web.zip" -Force
+az webapp deploy --resource-group rg-thornton-energy --name thornton-energy-web --src-path "$env:TEMP\thornton-web.zip" --type zip
 ```
 
----
+Apply new database migrations with `dotnet ef database update` (uses the connection string in user secrets) before deploying code that depends on them.
 
-## Angular concepts used
+## Skills and technologies demonstrated
 
-- **Standalone components** with lazy-loaded routes (`loadComponent`) and child routes
-- **Signals**: `signal`, `computed`, `toSignal`, `@let`, and signal two-way binding with `ngModel`
-- **RxJS**: `HttpClient` Observables, `pipe`, `map`, `switchMap`, `tap`, `forkJoin`, `BehaviorSubject`
-- **Forms**: template-driven (Login) and reactive (Register, Contact, admin forms), with a custom cross-field validator
-- **Routing**: functional `CanActivate` guard, route `data`, route parameters, `returnUrl` redirects, wildcard 404
-- **Custom pipe and directive**: `statusLabel` and `appStatusBadge` (host bindings)
-- **Built-in control flow**: `@if`, `@for` with `track`, `@switch`, `@empty`
-- **`NgOptimizedImage`** for photos
-- **Full CRUD** over HTTP: `GET`, `POST`, `PATCH`, `PUT`, `DELETE`
+- Layered web API design: controllers for HTTP only, services for business rules, a generic repository for data access, DTOs and AutoMapper at the boundary, a `Result<T>` type instead of exceptions for expected failures
+- Dependency injection (scoped, singleton, open generics), the options pattern, custom middleware, structured logging with correlation ids
+- Authentication and authorization with JWT, roles and per-record ownership, BCrypt hashing, rate limiting, CORS, secrets management
+- Relational design with EF Core code-first migrations, optimistic concurrency (`rowversion`), enums as text, unique indexes
+- SQL Server: audit triggers, a view, a stored procedure, `SESSION_CONTEXT`, time-zone conversion, all delivered through migrations
+- Testing: xUnit theories, Moq, in-memory SQLite, `WebApplicationFactory` integration tests, code coverage
+- Angular: standalone components, signals, reactive forms, an HTTP interceptor, route guards, lazy loading, Leaflet maps, plain CSS charts
+- Cloud: Azure App Service, Azure SQL, CLI deployments, configuration through app settings
 
----
+## How AI was used
 
-## Design decisions worth knowing
+An AI coding assistant helped write code, SQL and documents. Every AI-assisted SQL object and document is logged in [docs/AI-LOG.md](docs/AI-LOG.md) with the prompt, what came back, and what was checked or changed.
 
-- **Dates are stored as strings** (`'2026-10-21'`) and displayed with `DatePipe` in `'UTC'`. Without that, a date-only string shows one day early in US time zones.
-- **`todayIso()` and `nowIso()` build dates from local time**, because `toISOString()` is UTC and would stamp the next day after 8 pm in New York.
-- **json-server's cascade delete is turned off** (`--fks _fk`). By default, deleting a record also deletes everything that references it, and the admin user's `customerId: null` crashed that check.
-- **Login only follows in-app `returnUrl` paths** (starting with a single `/`), which prevents an open redirect to another site.
-- **Overdue is calculated, not stored.** `BillService` marks any unpaid bill past its due date as `overdue` when bills load, so the status is always current.
-- **The password never reaches `sessionStorage`.** `AuthService` saves the user record without it (`SessionUser = Omit<User, 'password'>`).
-- **Suspended and closed accounts can't log in.** Login checks the customer's account status and shows a customer-care message instead.
-- **Customers can't open other customers' bills** by typing an id into the URL; the bill page checks ownership.
+## More documentation
 
----
-
-## Limitations
-
-This is a front-end demo with a mock API, so some things a production utility portal would need are intentionally out of scope:
-
-- **Authentication is simulated.** Passwords are plain text in `db.json` and checked by query; the session is a copy of the user record in `sessionStorage`. A real system would hash passwords and issue tokens from a server.
-- **Authorization is client-side.** Guards and ownership checks run in the browser. A real API must enforce them on the server.
-- **Payments are simulated.** "Pay Now" marks a bill paid; no payment details are collected.
-- **Time-of-Use estimates use a flat rate.** Real Time-of-Use pricing depends on when energy is used.
-
-## Possible next steps
-
-- Replace json-server with an **ASP.NET Core Web API + Entity Framework Core** (the interfaces map directly to C# entities)
-- Move `API_URL` into Angular environment files for dev/prod
-- Add an HTTP interceptor for global error handling
-
----
-
-## Author
-
-**Isaiah**: B.A. Information Technology and Informatics, Rutgers University (2026). Revature .NET Full Stack training.
-
-Thornton Energy Inc., its people, and its data are fictional. Photos are from free stock libraries (Unsplash / Pexels).
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): file-by-file map, request flow, data model
+- [docs/BRD.md](docs/BRD.md): business requirements
+- [docs/DEMO.md](docs/DEMO.md): five-minute demo script
+- [docs/AI-LOG.md](docs/AI-LOG.md): AI usage log

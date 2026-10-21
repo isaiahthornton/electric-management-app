@@ -1,0 +1,27 @@
+<h1>Recent Activity</h1>
+<p>Status and rate-plan changes, recorded by the database itself.</p>
+
+@if (isLoading()) {
+  <p>Loading…</p>
+} @else if (errorMessage()) {
+  <p class="error-message">{{ errorMessage() }}</p>
+} @else if (entries().length === 0) {
+  <p>No changes recorded yet.</p>
+} @else {
+  <table class="admin-table">
+    <thead>
+      <tr><th>When</th><th>Record</th><th>What changed</th><th>Change</th><th>By</th></tr>
+    </thead>
+    <tbody>
+      @for (e of entries(); track e.id) {
+        <tr>
+          <td>{{ e.changedAt | date: 'MMM d, h:mm a' }}</td>
+          <td>{{ recordLabel(e) }}</td>
+          <td>{{ columnLabel(e) }}</td>
+          <td>{{ valueLabel(e, e.oldValue) }} → {{ valueLabel(e, e.newValue) }}</td>
+          <td>{{ e.changedBy ?? 'system' }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}
