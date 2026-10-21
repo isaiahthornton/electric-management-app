@@ -15,3 +15,9 @@ public static class AppRoles
     public const string Admin = nameof(UserRole.Admin);
     public const string Customer = nameof(UserRole.Customer);
 }
+
+// Rate-limiting policy names used with [EnableRateLimiting(...)]
+public static class RateLimitPolicies
+{
+    public const string PublicForms = "public-forms"; // login, register, contact form
+}

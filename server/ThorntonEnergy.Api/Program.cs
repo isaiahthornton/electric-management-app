@@ -1,7 +1,9 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
@@ -51,8 +53,32 @@ builder.Services
         };
     });
 
-// Authorization: decides what an authenticated user may do ([Authorize], roles). Rules are added in Phase 2.
-builder.Services.AddAuthorization();
+// Authorization: secure by default. Every endpoint needs a logged-in user unless it says [AllowAnonymous];
+// roles ([Authorize(Roles = ...)]) and ownership checks (AppControllerBase) narrow it further.
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
+
+// Rate limiting: at most 10 login/register/contact attempts per minute from one IP address (then 429)
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy(RateLimitPolicies.PublicForms, httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+            }));
+    options.OnRejected = async (context, cancellationToken) =>
+        await context.HttpContext.Response.WriteAsJsonAsync(
+            new { message = "Too many attempts. Please wait a minute and try again." }, cancellationToken);
+});
 
 // Which websites may call this API from a browser:
 // appsettings.json has localhost; Azure adds the live front end (Cors__AllowedOrigins__1)
@@ -88,7 +114,7 @@ using (var scope = app.Services.CreateScope())
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.MapOpenApi().AllowAnonymous(); // the API description itself stays public in development
     app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "Thornton Energy API"));
 }
 
@@ -97,7 +123,8 @@ app.UseHttpsRedirection();
 app.UseCors("Frontend");
 
 app.UseAuthentication(); // 1. Who are you? (reads and validates the JWT)
-app.UseAuthorization();  // 2. Are you allowed? (checks [Authorize])
+app.UseAuthorization();  // 2. Are you allowed? (roles, [AllowAnonymous], fallback policy)
+app.UseRateLimiter();    // 3. Too many attempts? (only endpoints with [EnableRateLimiting])
 
 app.MapControllers();
 
