@@ -10,6 +10,7 @@ import {
   provideRouter,
 } from '@angular/router';
 import { authGuard } from './auth-guard';
+import { AUTH_STORAGE, AuthService } from '../services/auth-service';
 
 describe('authGuard', () => {
   // Runs the guard inside Angular so inject() works
@@ -21,19 +22,24 @@ describe('authGuard', () => {
     );
   };
 
-  // AuthService reads sessionStorage when it's created, so set it up before configuring
+  // AuthService restores the session from sessionStorage when it's created, so set it up before configuring
   const loginAs = (role: 'admin' | 'customer' | null) => {
     sessionStorage.clear();
     if (role) {
       const user = { id: 1, email: 'test@example.com', role, customerId: role === 'customer' ? 1 : null };
-      sessionStorage.setItem('currentUser', JSON.stringify(user));
+      sessionStorage.setItem(AUTH_STORAGE.user, JSON.stringify(user));
+      sessionStorage.setItem(AUTH_STORAGE.token, 'header.payload.signature');
+      sessionStorage.setItem(AUTH_STORAGE.expiresAt, String(Date.now() + 60 * 60 * 1000));
     }
     TestBed.configureTestingModule({
       providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     });
   };
 
-  afterEach(() => sessionStorage.clear());
+  afterEach(() => {
+    TestBed.inject(AuthService).logout(); // cancels the auto-logout timer
+    sessionStorage.clear();
+  });
 
   it('sends logged-out users to /login with a returnUrl', () => {
     loginAs(null);
@@ -59,5 +65,15 @@ describe('authGuard', () => {
   it('lets a user with the right role through', () => {
     loginAs('customer');
     expect(runGuard('customer', '/account')).toBe(true);
+  });
+
+  it('treats an expired token as logged out', () => {
+    loginAs('customer');
+    sessionStorage.setItem(AUTH_STORAGE.expiresAt, String(Date.now() - 1000));
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
+    });
+    expect(runGuard('customer', '/account')).toBeInstanceOf(UrlTree);
   });
 });
