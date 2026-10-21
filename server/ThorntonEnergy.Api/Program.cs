@@ -11,10 +11,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection"),
         sql => sql.EnableRetryOnFailure())); // Azure SQL auto-pauses; retry while it wakes up
 
-// Let the Angular dev server call this API from the browser
+// Which websites may call this API from a browser:
+// appsettings.json has localhost; Azure adds the live front end (Cors__AllowedOrigins__1)
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
 builder.Services.AddCors(options =>
-    options.AddPolicy("Angular", policy =>
-        policy.WithOrigins("http://localhost:4200")
+    options.AddPolicy("Frontend", policy =>
+        policy.WithOrigins(allowedOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod()));
 
@@ -48,7 +50,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("Angular");
+app.UseCors("Frontend");
 
 app.UseAuthorization();
 
