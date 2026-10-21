@@ -19,7 +19,7 @@ export class CustomerService {
     return this.http.patch<Customer>(`${this.url}/${customerId}`, { ratePlanId });
   }
   getAllCustomers(): Observable<Customer[]> {
-  return this.http.get<Customer[]>(`${this.url}?_sort=lastName&_order=asc`);
+  return this.http.get<Customer[]>(this.url);
   }
   updateCustomerStatus(customerId: number, status: AccountStatus): Observable<Customer> {
     return this.http.patch<Customer>(`${this.url}/${customerId}`, { status });

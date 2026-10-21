@@ -13,7 +13,7 @@ export class BillService {
 
   getBillsByCustomer(customerId: number): Observable<Bill[]> {
     return this.http
-      .get<Bill[]>(`${this.url}?customerId=${customerId}&_sort=periodStart&_order=desc`)
+      .get<Bill[]>(`${this.url}?customerId=${customerId}`)
       .pipe(map((bills) => bills.map((b) => withOverdueStatus(b))));
   }
   getBillById(billId: number): Observable<Bill> {
@@ -27,7 +27,7 @@ export class BillService {
   }
   getAllBills(): Observable<Bill[]> {
     return this.http
-      .get<Bill[]>(`${this.url}?_sort=periodStart&_order=desc`)
+      .get<Bill[]>(this.url)
       .pipe(map((bills) => bills.map((b) => withOverdueStatus(b))));
   }
   createBill(bill: Omit<Bill, 'id'>): Observable<Bill> {

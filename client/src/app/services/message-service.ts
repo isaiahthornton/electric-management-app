@@ -14,7 +14,7 @@ export class MessageService {
   }
 
   getAllMessages(): Observable<Message[]> {
-    return this.http.get<Message[]>(`${this.url}?_sort=sentAt&_order=desc`);
+    return this.http.get<Message[]>(this.url);
   }
 
   markRead(id: number): Observable<Message> {

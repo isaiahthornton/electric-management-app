@@ -13,15 +13,15 @@ export class OutageService {
 
   getOutagesByCustomer(customerId: number): Observable<Outage[]> {
     return this.http.get<Outage[]>(
-      `${this.url}?customerId=${customerId}&_sort=timeReported&_order=desc`,
+      `${this.url}?customerId=${customerId}`,
     );
   }
-  // POST creates a new record; json-server assigns the id and returns the saved outage
+  // POST creates a new record; the API assigns the id and returns the saved outage
   reportOutage(outage: Omit<Outage, 'id'>): Observable<Outage> {
     return this.http.post<Outage>(this.url, outage);
   }
   getAllOutages(): Observable<Outage[]> {
-  return this.http.get<Outage[]>(`${this.url}?_sort=timeReported&_order=desc`);
+  return this.http.get<Outage[]>(this.url);
   }
   // Admin only: every outage with its customer name and location
   getOutageMap(): Observable<OutageMapItem[]> {
