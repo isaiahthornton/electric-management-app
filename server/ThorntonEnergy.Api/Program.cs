@@ -19,10 +19,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 // ---------- Services (dependency injection) ----------
 
-builder.Services.AddDbContext<AppDbContext>(options =>
+// The interceptor tells SQL Server who is signed in, so the audit triggers can record it
+builder.Services.AddScoped<AppUserSessionInterceptor>();
+builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        sql => sql.EnableRetryOnFailure())); // Azure SQL auto-pauses; retry while it wakes up
+            builder.Configuration.GetConnectionString("DefaultConnection"),
+            sql => sql.EnableRetryOnFailure()) // Azure SQL auto-pauses; retry while it wakes up
+        .AddInterceptors(serviceProvider.GetRequiredService<AppUserSessionInterceptor>()));
 
 // JWT settings: Issuer/Audience/ExpiresMinutes from appsettings.json; Key from user secrets (local) or Jwt__Key (Azure)
 var jwtSection = builder.Configuration.GetSection(JwtOptions.SectionName);
@@ -51,6 +54,7 @@ builder.Services.AddScoped<IMeterService, MeterService>();
 builder.Services.AddScoped<IOutageService, OutageService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IRatePlanService, RatePlanService>();
+builder.Services.AddScoped<IAdminInsightService, AdminInsightService>();
 
 // AutoMapper copies entities to DTOs and back. The license key is optional (without it, it only logs a reminder).
 builder.Services.AddAutoMapper(cfg => cfg.LicenseKey = builder.Configuration["AutoMapper:LicenseKey"], typeof(MappingProfile));

@@ -13,6 +13,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Outage> Outages => Set<Outage>();
     public DbSet<ContactMessage> ContactMessages => Set<ContactMessage>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<AdminKpis> AdminKpis => Set<AdminKpis>(); // read-only: backed by the vw_AdminKpis view
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -36,6 +38,25 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<Customer>().HasIndex(c => c.AccountNumber).IsUnique();
         modelBuilder.Entity<Meter>().HasIndex(m => m.MeterNumber).IsUnique();
         modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
+
+        // These tables have audit triggers. EF must be told, or SaveChanges fails (EF reads results with an OUTPUT clause,
+        // which SQL Server does not allow on a table that has triggers).
+        modelBuilder.Entity<Bill>().ToTable(tb => tb.HasTrigger("trg_Bills_Audit"));
+        modelBuilder.Entity<Customer>().ToTable(tb => tb.HasTrigger("trg_Customers_Audit"));
+        modelBuilder.Entity<Outage>().ToTable(tb => tb.HasTrigger("trg_Outages_Audit"));
+
+        // A SQL view, not a table: no key, and migrations do not create it (the AdminInsight migration does, with SQL)
+        modelBuilder.Entity<AdminKpis>().HasNoKey().ToView("vw_AdminKpis");
+        modelBuilder.Entity<AdminKpis>().Property(k => k.UnpaidBalance).HasPrecision(18, 2);
+        modelBuilder.Entity<AdminKpis>().Property(k => k.OverdueBalance).HasPrecision(18, 2);
+        modelBuilder.Entity<AdminKpis>().Property(k => k.RevenueThisMonth).HasPrecision(18, 2);
+        modelBuilder.Entity<AdminKpis>().Property(k => k.AvgKwhLastMonth).HasPrecision(18, 1);
+
+        modelBuilder.Entity<AuditLog>().Property(a => a.TableName).HasMaxLength(50);
+        modelBuilder.Entity<AuditLog>().Property(a => a.ColumnName).HasMaxLength(50);
+        modelBuilder.Entity<AuditLog>().Property(a => a.OldValue).HasMaxLength(100);
+        modelBuilder.Entity<AuditLog>().Property(a => a.NewValue).HasMaxLength(100);
+        modelBuilder.Entity<AuditLog>().Property(a => a.ChangedBy).HasMaxLength(256);
 
         // Deleting a rate plan must not delete its customers
         modelBuilder.Entity<Customer>()
