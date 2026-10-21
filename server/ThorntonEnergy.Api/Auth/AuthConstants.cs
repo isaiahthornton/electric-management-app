@@ -1,0 +1,17 @@
+using ThorntonEnergy.Api.Models;
+
+namespace ThorntonEnergy.Api.Auth;
+
+// Custom claim names in our JWT (standard ones like "sub" and "email" come from JwtRegisteredClaimNames)
+public static class AppClaims
+{
+    public const string Role = "role";
+    public const string CustomerId = "customerId";
+}
+
+// Role names used in the token and in [Authorize(Roles = ...)]
+public static class AppRoles
+{
+    public const string Admin = nameof(UserRole.Admin);
+    public const string Customer = nameof(UserRole.Customer);
+}

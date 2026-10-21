@@ -1,15 +1,58 @@
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
+using ThorntonEnergy.Api.Auth;
 using ThorntonEnergy.Api.Data;
+using ThorntonEnergy.Api.OpenApi;
+using ThorntonEnergy.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// ---------- Services (dependency injection) ----------
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         sql => sql.EnableRetryOnFailure())); // Azure SQL auto-pauses; retry while it wakes up
+
+// JWT settings: Issuer/Audience/ExpiresMinutes from appsettings.json; Key from user secrets (local) or Jwt__Key (Azure)
+var jwtSection = builder.Configuration.GetSection(JwtOptions.SectionName);
+var jwt = jwtSection.Get<JwtOptions>() ?? new JwtOptions();
+if (jwt.Key.Length < 32)
+    throw new InvalidOperationException(
+        "Jwt:Key is missing or shorter than 32 characters. Set it with 'dotnet user-secrets' locally or the Jwt__Key app setting in Azure.");
+builder.Services.Configure<JwtOptions>(jwtSection);
+
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<ITokenService, TokenService>(); // stateless, so one instance for the whole app
+
+// Authentication: read "Authorization: Bearer <token>" and verify signature, issuer, audience and expiry on every request
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.MapInboundClaims = false; // keep the short claim names we wrote ("sub", "email", "role")
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwt.Issuer,
+            ValidateAudience = true,
+            ValidAudience = jwt.Audience,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key)),
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromMinutes(1),
+            NameClaimType = JwtRegisteredClaimNames.Email,
+            RoleClaimType = AppClaims.Role,
+        };
+    });
+
+// Authorization: decides what an authenticated user may do ([Authorize], roles). Rules are added in Phase 2.
+builder.Services.AddAuthorization();
 
 // Which websites may call this API from a browser:
 // appsettings.json has localhost; Azure adds the live front end (Cors__AllowedOrigins__1)
@@ -29,8 +72,8 @@ builder.Services
         options.JsonSerializerOptions.Converters.Add(
             new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower)));
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// OpenAPI document (+ the Authorize button for JWTs in Swagger UI)
+builder.Services.AddOpenApi(options => options.AddDocumentTransformer<BearerSecuritySchemeTransformer>());
 
 var app = builder.Build();
 
@@ -41,7 +84,8 @@ using (var scope = app.Services.CreateScope())
     await DbSeeder.SeedAsync(db, app.Environment.ContentRootPath);
 }
 
-// Configure the HTTP request pipeline.
+// ---------- HTTP request pipeline (order matters) ----------
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -52,7 +96,8 @@ app.UseHttpsRedirection();
 
 app.UseCors("Frontend");
 
-app.UseAuthorization();
+app.UseAuthentication(); // 1. Who are you? (reads and validates the JWT)
+app.UseAuthorization();  // 2. Are you allowed? (checks [Authorize])
 
 app.MapControllers();
 
