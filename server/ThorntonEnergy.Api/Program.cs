@@ -8,7 +8,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using ThorntonEnergy.Api.Auth;
+using ThorntonEnergy.Api.Common;
 using ThorntonEnergy.Api.Data;
+using ThorntonEnergy.Api.Mapping;
+using ThorntonEnergy.Api.Middleware;
 using ThorntonEnergy.Api.OpenApi;
 using ThorntonEnergy.Api.Services;
 
@@ -30,7 +33,27 @@ if (jwt.Key.Length < 32)
 builder.Services.Configure<JwtOptions>(jwtSection);
 
 builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<IUtilityClock, UtilityClock>();  // "now" and "today" in the utility time zone
 builder.Services.AddSingleton<ITokenService, TokenService>(); // stateless, so one instance for the whole app
+
+// Who is calling? (reads the JWT of the current request)
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUser, CurrentUser>();
+
+// Data access: one generic repository class serves every entity
+builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+
+// Business rules live in the services (one instance per request, like the DbContext)
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IBillService, BillService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IMeterService, MeterService>();
+builder.Services.AddScoped<IOutageService, OutageService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<IRatePlanService, RatePlanService>();
+
+// AutoMapper copies entities to DTOs and back. The license key is optional (without it, it only logs a reminder).
+builder.Services.AddAutoMapper(cfg => cfg.LicenseKey = builder.Configuration["AutoMapper:LicenseKey"], typeof(MappingProfile));
 
 // Authentication: read "Authorization: Bearer <token>" and verify signature, issuer, audience and expiry on every request
 builder.Services
@@ -87,7 +110,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy("Frontend", policy =>
         policy.WithOrigins(allowedOrigins)
               .AllowAnyHeader()
-              .AllowAnyMethod()));
+              .AllowAnyMethod()
+              .WithExposedHeaders(RequestLoggingMiddleware.HeaderName))); // lets the browser read the correlation id
 
 builder.Services
     .AddControllers(options =>
@@ -111,6 +135,10 @@ using (var scope = app.Services.CreateScope())
 }
 
 // ---------- HTTP request pipeline (order matters) ----------
+
+// First, so every request gets a correlation id and every error is caught
+app.UseMiddleware<RequestLoggingMiddleware>();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {

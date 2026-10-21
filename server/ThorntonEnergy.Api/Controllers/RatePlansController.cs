@@ -1,75 +1,46 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using ThorntonEnergy.Api.Auth;
-using ThorntonEnergy.Api.Data;
-using ThorntonEnergy.Api.Models;
+using ThorntonEnergy.Api.Dtos;
+using ThorntonEnergy.Api.Services;
 
 namespace ThorntonEnergy.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize(Roles = AppRoles.Admin)] // managing plans is admin-only...
-public class RatePlansController(AppDbContext db) : ControllerBase
+public class RatePlansController(IRatePlanService ratePlans) : AppControllerBase
 {
     // GET api/ratePlans (...but anyone can view them: the landing page shows the plans)
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<List<RatePlan>>> GetAll()
-    {
-        return await db.RatePlans.OrderBy(r => r.Id).ToListAsync();
-    }
+    public async Task<ActionResult<List<RatePlanDto>>> GetAll() =>
+        FromResult(await ratePlans.GetAllAsync());
 
     // GET api/ratePlans/1
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<RatePlan>> GetById(int id)
-    {
-        var plan = await db.RatePlans.FindAsync(id);
-        if (plan is null) return NotFound();
-        return plan;
-    }
+    public async Task<ActionResult<RatePlanDto>> GetById(int id) =>
+        FromResult(await ratePlans.GetByIdAsync(id));
 
     // POST api/ratePlans
     [HttpPost]
-    public async Task<ActionResult<RatePlan>> Create(RatePlan plan)
+    public async Task<ActionResult<RatePlanDto>> Create(RatePlanRequest request)
     {
-        plan.Id = 0;
-        db.RatePlans.Add(plan);
-        await db.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetById), new { id = plan.Id }, plan);
+        var result = await ratePlans.CreateAsync(request);
+        if (!result.IsSuccess) return Failure(result);
+        return CreatedAtAction(nameof(GetById), new { id = result.Value!.Id }, result.Value);
     }
 
     // PUT api/ratePlans/1 (replaces every field)
     [HttpPut("{id:int}")]
-    public async Task<ActionResult<RatePlan>> Replace(int id, RatePlan input)
-    {
-        if (id != input.Id)
-            return BadRequest(new { message = "The id in the URL and the body must match." });
-
-        var plan = await db.RatePlans.FindAsync(id);
-        if (plan is null) return NotFound();
-
-        plan.Name = input.Name;
-        plan.PricePerKwh = input.PricePerKwh;
-        plan.MonthlyFee = input.MonthlyFee;
-        plan.Description = input.Description;
-
-        await db.SaveChangesAsync();
-        return plan;
-    }
+    public async Task<ActionResult<RatePlanDto>> Replace(int id, RatePlanRequest request) =>
+        FromResult(await ratePlans.ReplaceAsync(id, request));
 
     // DELETE api/ratePlans/1 (blocked while customers are on the plan)
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var plan = await db.RatePlans.FindAsync(id);
-        if (plan is null) return NotFound();
-
-        if (await db.Customers.AnyAsync(c => c.RatePlanId == id))
-            return Conflict(new { message = "Customers are still on this plan. Move them to another plan first." });
-
-        db.RatePlans.Remove(plan);
-        await db.SaveChangesAsync();
-        return NoContent();
+        var result = await ratePlans.DeleteAsync(id);
+        return result.IsSuccess ? NoContent() : Failure(result);
     }
 }

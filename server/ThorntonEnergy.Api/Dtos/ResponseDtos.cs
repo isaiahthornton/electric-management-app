@@ -1,0 +1,22 @@
+using ThorntonEnergy.Api.Models;
+
+namespace ThorntonEnergy.Api.Dtos;
+
+// What the API sends back. Same JSON fields Angular already expects; entities never leave the server directly.
+public record BillDto(int Id, int CustomerId, DateOnly PeriodStart, DateOnly PeriodEnd, DateOnly DueDate, int KwhUsed,
+    decimal AmountDue, BillStatus Status, decimal EnergyCharge, decimal ServiceCharge, DateOnly? PaidDate);
+
+public record CustomerDto(int Id, string AccountNumber, string FirstName, string LastName, string Phone, string Email,
+    string ServiceAddress, int RatePlanId, AccountStatus Status);
+
+public record MeterDto(int Id, int CustomerId, string MeterNumber, DateOnly InstallationDate, MeterStatus Status);
+
+public record MeterReadingDto(int Id, int MeterId, DateOnly ReadingDate, int ReadingValue);
+
+public record OutageDto(int Id, int CustomerId, string Address, string Description, DateTime TimeReported,
+    DateTime? TimeResolved, OutageStatus Status);
+
+public record ContactMessageDto(int Id, string Name, string Email, MessageTopic Topic, string? AccountNumber,
+    string Message, DateTime SentAt, MessageStatus Status);
+
+public record RatePlanDto(int Id, string Name, decimal PricePerKwh, decimal MonthlyFee, string Description);

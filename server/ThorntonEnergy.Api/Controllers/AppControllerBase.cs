@@ -1,31 +1,32 @@
 using Microsoft.AspNetCore.Mvc;
-using ThorntonEnergy.Api.Auth;
+using ThorntonEnergy.Api.Common;
 
 namespace ThorntonEnergy.Api.Controllers;
 
-// Shared ownership rules for every controller that serves customer data (each controller "is an" AppControllerBase)
+// Controllers only deal with HTTP. The business rules live in the services; this turns a service
+// Result<T> into the matching HTTP response.
 public abstract class AppControllerBase : ControllerBase
 {
-    protected bool IsAdmin => User.IsAdmin();
-
-    // The logged-in customer's id, read from the JWT (null for admins)
-    protected int? CurrentCustomerId => User.GetCustomerId();
-
-    // Single-record rule: admins can reach any customer's data; customers only their own
-    protected bool CanAccessCustomer(int customerId) => IsAdmin || CurrentCustomerId == customerId;
-
-    // List rule: which customer's rows may this request see?
-    //   admin    -> whatever they asked for (null = everyone)
-    //   customer -> always their own id; asking for someone else's returns false (refused)
-    protected bool TryGetCustomerScope(int? requestedCustomerId, out int? scope)
+    // Success -> 200 with the value, otherwise the matching error response
+    protected ActionResult<T> FromResult<T>(Result<T> result)
     {
-        if (IsAdmin)
-        {
-            scope = requestedCustomerId;
-            return true;
-        }
+        if (result.IsSuccess) return result.Value!;
+        return Failure(result);
+    }
 
-        scope = CurrentCustomerId;
-        return scope is not null && (requestedCustomerId is null || requestedCustomerId == scope);
+    protected ActionResult Failure<T>(Result<T> result)
+    {
+        var body = new { message = result.Error };
+
+        return result.Status switch
+        {
+            ResultStatus.NotFound => result.Error is null ? NotFound() : NotFound(body),
+            ResultStatus.Unauthorized => Unauthorized(body),
+            // No message -> plain Forbid(); with a message -> 403 and { message }
+            ResultStatus.Forbidden => result.Error is null ? Forbid() : StatusCode(StatusCodes.Status403Forbidden, body),
+            ResultStatus.Invalid => BadRequest(body),
+            ResultStatus.Conflict => Conflict(body),
+            _ => StatusCode(StatusCodes.Status500InternalServerError),
+        };
     }
 }
